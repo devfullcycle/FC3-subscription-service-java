@@ -1,4 +1,4 @@
-package com.fullcycle.codeflix.subscription.domain.user;
+package com.fullcycle.codeflix.subscription.domain.person;
 
 import com.fullcycle.codeflix.subscription.domain.exceptions.DomainException;
 import com.fullcycle.codeflix.subscription.domain.validation.ValidationError;

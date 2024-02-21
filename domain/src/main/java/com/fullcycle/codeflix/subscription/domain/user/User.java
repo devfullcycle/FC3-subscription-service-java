@@ -1,82 +1,58 @@
 package com.fullcycle.codeflix.subscription.domain.user;
 
 import com.fullcycle.codeflix.subscription.domain.AggregateRoot;
-import com.fullcycle.codeflix.subscription.domain.utils.IdUtils;
+import com.fullcycle.codeflix.subscription.domain.person.Address;
+import com.fullcycle.codeflix.subscription.domain.person.Document;
+import com.fullcycle.codeflix.subscription.domain.person.Email;
 
 public class User extends AggregateRoot<UserId> {
 
     private String firstname;
     private String lastname;
+    private Email email;
     private Address address;
     private Document document;
 
     private User(
-            final String userId,
+            final UserId userId,
             final String firstname,
             final String lastname,
-            final String street,
-            final String number,
-            final String complement,
-            final String neighborhood,
-            final String zipcode,
-            final String city,
-            final String state,
-            final String country,
+            final String email,
             final String documentNumber,
             final String documentType
     ) {
-        super(new UserId(userId));
+        super(userId);
         setFirstname(firstname);
         setLastname(lastname);
-        setAddress(street, number, complement, neighborhood, zipcode, city, state, country);
+        setEmail(email);
         setDocument(documentType, documentNumber);
     }
 
-    public static User newUser(
-            final String firstname,
-            final String lastname,
-            final String street,
-            final String number,
-            final String complement,
-            final String neighborhood,
-            final String zipcode,
-            final String city,
-            final String state,
-            final String country,
-            final String documentNumber,
-            final String documentType
+    private User(
+            final UserId userId,
+            final String firstname, final String lastname, final String email,
+            final Address address,
+            final String documentNumber, final String documentType
     ) {
-        return new User(
-                IdUtils.uniqueId(),
-                firstname,
-                lastname,
-                street, number, complement, neighborhood, zipcode, city, state, country,
-                documentNumber, documentType
-        );
+        this(userId, firstname, lastname, email, documentNumber, documentType);
+        setAddress(address);
+    }
+
+    public static User newUser(
+            final UserId userId,
+            final String firstname, final String lastname, final String email,
+            final String documentNumber, final String documentType
+    ) {
+        return new User(userId, firstname, lastname, email, documentNumber, documentType);
     }
 
     public static User with(
-            final String userId,
-            final String firstname,
-            final String lastname,
-            final String street,
-            final String number,
-            final String complement,
-            final String neighborhood,
-            final String zipcode,
-            final String city,
-            final String state,
-            final String country,
-            final String documentNumber,
-            final String documentType
+            final UserId userId,
+            final String firstname, final String lastname, final String email,
+            final Address address,
+            final String documentNumber, final String documentType
     ) {
-        return new User(
-                userId,
-                firstname,
-                lastname,
-                street, number, complement, neighborhood, zipcode, city, state, country,
-                documentNumber, documentType
-        );
+        return new User(userId, firstname, lastname, email, address, documentNumber, documentType);
     }
 
     public String firstname() {
@@ -85,6 +61,10 @@ public class User extends AggregateRoot<UserId> {
 
     public String lastname() {
         return lastname;
+    }
+
+    public Email email() {
+        return email;
     }
 
     public Address address() {
@@ -109,17 +89,13 @@ public class User extends AggregateRoot<UserId> {
         this.lastname = lastname;
     }
 
-    private void setAddress(
-            final String street,
-            final String number,
-            final String complement,
-            final String neighborhood,
-            final String zipcode,
-            final String city,
-            final String state,
-            final String country
-    ) {
-        this.address = new Address(street, number, complement, neighborhood, zipcode, city, state, country);
+    public void setEmail(final String email) {
+        this.email = new Email(email);
+    }
+
+    private void setAddress(final Address address) {
+        this.assertArgumentNotNull(address, "'address' should not be null");
+        this.address = address;
     }
 
     private void setDocument(final String documentType, final String documentValue) {
