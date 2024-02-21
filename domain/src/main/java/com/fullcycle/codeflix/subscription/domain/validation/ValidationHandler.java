@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface ValidationHandler {
 
-    ValidationHandler append(Error anError);
+    ValidationHandler append(ValidationError anError);
 
     ValidationHandler append(String anError);
 
@@ -12,13 +12,13 @@ public interface ValidationHandler {
 
     <T> T validate(Validation<T> aValidation);
 
-    List<Error> getErrors();
+    List<ValidationError> getErrors();
 
     default boolean hasError() {
         return getErrors() != null && !getErrors().isEmpty();
     }
 
-    default Error firstError() {
+    default ValidationError firstError() {
         if (getErrors() != null && !getErrors().isEmpty()) {
             return getErrors().get(0);
         } else {

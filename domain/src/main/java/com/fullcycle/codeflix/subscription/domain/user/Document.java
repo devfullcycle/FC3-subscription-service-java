@@ -1,9 +1,8 @@
 package com.fullcycle.codeflix.subscription.domain.user;
 
-import com.fullcycle.codeflix.subscription.domain.exceptions.DomainException;
-import com.fullcycle.codeflix.subscription.domain.validation.Error;
+import com.fullcycle.codeflix.subscription.domain.ValueObject;
 
-public sealed interface Document {
+public sealed interface Document extends ValueObject {
 
     static Document create(String documentType, String documentNumber) {
         return DocumentFactory.create(documentNumber, documentType);
@@ -11,25 +10,15 @@ public sealed interface Document {
 
     record Cpf(String value) implements Document {
         public Cpf {
-            if (value == null) {
-                throw DomainException.with(new Error("'cpf' should not be empty"));
-            }
-
-            if (value.length() != 11) {
-                throw DomainException.with(new Error("'cpf' should have 11 digits"));
-            }
+            this.assertArgumentNotNull(value, "CPF is required");
+            this.assertArgumentLength(value, 11, "invalid CPF");
         }
     }
 
     record Cnpj(String value) implements Document {
         public Cnpj {
-            if (value == null) {
-                throw DomainException.with(new Error("'cnpj' should not be empty"));
-            }
-
-            if (value.length() != 14) {
-                throw DomainException.with(new Error("'cnpj' should have 14 digits"));
-            }
+            this.assertArgumentNotNull(value, "CNPJ is required");
+            this.assertArgumentLength(value, 14, "invalid CNPJ");
         }
     }
 }

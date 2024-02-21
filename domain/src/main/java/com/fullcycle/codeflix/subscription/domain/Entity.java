@@ -2,7 +2,7 @@ package com.fullcycle.codeflix.subscription.domain;
 
 import java.util.*;
 
-public abstract class Entity<ID extends Identifier> {
+public abstract class Entity<ID extends Identifier> implements AssertionConcern {
 
     protected final ID id;
     private final List<DomainEvent> domainEvents;

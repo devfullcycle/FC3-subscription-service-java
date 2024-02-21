@@ -28,9 +28,16 @@ public interface AssertionConcern {
         }
     }
 
-    default void assertArgumentLength(String aString, int aMaximum, String aMessage) {
+    default void assertArgumentLength(String aString, int aLength, String aMessage) {
         int length = aString.trim().length();
-        if (length > aMaximum) {
+        if (length != aLength) {
+            throw new IllegalArgumentException(aMessage);
+        }
+    }
+
+    default void assertArgumentMaxLength(String aString, int aMaxLength, String aMessage) {
+        int length = aString.trim().length();
+        if (length >= aMaxLength) {
             throw new IllegalArgumentException(aMessage);
         }
     }
@@ -43,7 +50,7 @@ public interface AssertionConcern {
     }
 
     default String assertArgumentNotEmpty(String aString, String aMessage) {
-        if (aString == null || aString.trim().isEmpty()) {
+        if (aString == null || aString.isBlank()) {
             throw new IllegalArgumentException(aMessage);
         }
         return aString;

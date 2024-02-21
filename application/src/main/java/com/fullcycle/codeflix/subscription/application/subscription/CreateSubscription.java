@@ -2,7 +2,6 @@ package com.fullcycle.codeflix.subscription.application.subscription;
 
 import com.fullcycle.codeflix.subscription.application.UseCase;
 import com.fullcycle.codeflix.subscription.domain.AggregateRoot;
-import com.fullcycle.codeflix.subscription.domain.AssertionConcern;
 import com.fullcycle.codeflix.subscription.domain.Identifier;
 import com.fullcycle.codeflix.subscription.domain.exceptions.DomainException;
 import com.fullcycle.codeflix.subscription.domain.plan.BillingCycle;
@@ -13,13 +12,12 @@ import com.fullcycle.codeflix.subscription.domain.subscription.SubscriptionGatew
 import com.fullcycle.codeflix.subscription.domain.user.User;
 import com.fullcycle.codeflix.subscription.domain.user.UserGateway;
 import com.fullcycle.codeflix.subscription.domain.user.UserId;
-import com.fullcycle.codeflix.subscription.domain.validation.Error;
+import com.fullcycle.codeflix.subscription.domain.validation.ValidationError;
 
 import java.util.Objects;
 
 public class CreateSubscription
-        extends UseCase<CreateSubscription.Input, CreateSubscription.Output>
-        implements AssertionConcern {
+        extends UseCase<CreateSubscription.Command, CreateSubscription.Output> {
 
     private final PlanGateway planGateway;
     private final SubscriptionGateway subscriptionGateway;
@@ -36,13 +34,12 @@ public class CreateSubscription
     }
 
     @Override
-    public Output execute(final Input input) {
-        final var userId = new UserId(input.userId);
-        final var price = assertArgumentNotNull(input.price, "'price' should not be null");
-        final var billingCycle = BillingCycle.of(input.billingCycle)
-                .orElseThrow(() -> DomainException.with(new Error("Invalid billing cycle")));
+    public Output execute(final CreateSubscription.Command input) {
+        final var userId = new UserId(input.userId());
+        final var price = input.price();
+        final var billingCycle = input.billingCycle();
 
-        validatePlanOption(new PlanId(input.planId), billingCycle, price);
+        validatePlanOption(new PlanId(input.planId()), billingCycle, price);
 
         final var user = userGateway.userOfId(userId)
                 .orElseThrow(() -> notFound(User.class, userId));
@@ -61,7 +58,7 @@ public class CreateSubscription
     private void validatePlanOption(final PlanId planId, final BillingCycle billingCycle, final Double price) {
         planGateway.planOfId(planId)
                 .filter(it -> it.hasOption(billingCycle, price))
-                .orElseThrow(() -> DomainException.with(new Error("Invalid plan or selected plan option")));
+                .orElseThrow(() -> DomainException.with(new ValidationError("Invalid plan or selected plan option")));
     }
 
     private Subscription newSubscriptionWith(final User user, final BillingCycle billingCycle, final Double price) {
@@ -75,16 +72,14 @@ public class CreateSubscription
     }
 
     private DomainException notFound(Class<? extends AggregateRoot<?>> clazz, Identifier id) {
-        return DomainException.with(new Error("%s with id %s was not found".formatted(clazz.getCanonicalName(), id.value())));
+        return DomainException.with(new ValidationError("%s with id %s was not found".formatted(clazz.getCanonicalName(), id.value())));
     }
 
-    public record Input(
-            String userId,
-            String planId,
-            String billingCycle,
-            Double price
-    ) {
-
+    public interface Command {
+        String userId();
+        String planId();
+        BillingCycle billingCycle();
+        Double price();
     }
 
     public record Output(String subscriptionId) {

@@ -3,10 +3,8 @@ package com.fullcycle.codeflix.subscription.infrastructure.configuration;
 import com.nimbusds.jose.shaded.gson.JsonObject;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -28,11 +26,7 @@ import java.util.stream.Stream;
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfig {
 
-    private static final String ROLE_ADMIN = "CATALOGO_ADMIN";
-    private static final String ROLE_CAST_MEMBERS = "CATALOGO_CAST_MEMBERS";
-    private static final String ROLE_CATEGORIES = "CATALOGO_CATEGORIES";
-    private static final String ROLE_GENRES = "CATALOGO_GENRES";
-    private static final String ROLE_VIDEOS = "CATALOGO_VIDEOS";
+    private static final String ROLE_USER = "CODEFLIX_USER";
 
     @Bean
     public SecurityFilterChain securityFilterChain(final HttpSecurity http) throws Exception {
@@ -43,11 +37,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> {
                     authorize
                             .requestMatchers("authorization-callback").permitAll()
-                            .requestMatchers("/cast_members*").hasAnyRole(ROLE_ADMIN, ROLE_CAST_MEMBERS)
-                            .requestMatchers("/categories*").hasAnyRole(ROLE_ADMIN, ROLE_CATEGORIES)
-                            .requestMatchers("/genres*").hasAnyRole(ROLE_ADMIN, ROLE_GENRES)
-                            .requestMatchers("/videos*").hasAnyRole(ROLE_ADMIN, ROLE_VIDEOS)
-                            .anyRequest().hasRole(ROLE_ADMIN);
+                            .requestMatchers("/subscriptions*").hasAnyRole(ROLE_USER)
+                            .anyRequest().hasRole(ROLE_USER);
                 })
                 .oauth2ResourceServer(oauth -> {
                     oauth.jwt(jwt -> jwt.jwtAuthenticationConverter(new KeycloakJwtConverter()));

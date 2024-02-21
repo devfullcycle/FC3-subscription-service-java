@@ -1,27 +1,27 @@
 package com.fullcycle.codeflix.subscription.domain.exceptions;
 
-import com.fullcycle.codeflix.subscription.domain.validation.Error;
+import com.fullcycle.codeflix.subscription.domain.validation.ValidationError;
 
 import java.util.List;
 
 public class DomainException extends NoStacktraceException {
 
-    protected final List<Error> errors;
+    protected final List<ValidationError> errors;
 
-    protected DomainException(final String aMessage, final List<Error> anErrors) {
+    protected DomainException(final String aMessage, final List<ValidationError> anErrors) {
         super(aMessage);
         this.errors = anErrors;
     }
 
-    public static DomainException with(final Error anErrors) {
+    public static DomainException with(final ValidationError anErrors) {
         return new DomainException(anErrors.message(), List.of(anErrors));
     }
 
-    public static DomainException with(final List<Error> anErrors) {
+    public static DomainException with(final List<ValidationError> anErrors) {
         return new DomainException("", anErrors);
     }
 
-    public List<Error> getErrors() {
+    public List<ValidationError> getErrors() {
         return errors;
     }
 }

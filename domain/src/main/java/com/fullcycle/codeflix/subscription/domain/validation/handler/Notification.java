@@ -2,7 +2,7 @@ package com.fullcycle.codeflix.subscription.domain.validation.handler;
 
 import com.fullcycle.codeflix.subscription.domain.exceptions.DomainException;
 import com.fullcycle.codeflix.subscription.domain.exceptions.NotificationException;
-import com.fullcycle.codeflix.subscription.domain.validation.Error;
+import com.fullcycle.codeflix.subscription.domain.validation.ValidationError;
 import com.fullcycle.codeflix.subscription.domain.validation.ValidationHandler;
 
 import java.util.ArrayList;
@@ -10,9 +10,9 @@ import java.util.List;
 
 public class Notification implements ValidationHandler {
 
-    private final List<Error> errors;
+    private final List<ValidationError> errors;
 
-    private Notification(final List<Error> errors) {
+    private Notification(final List<ValidationError> errors) {
         this.errors = errors;
     }
 
@@ -21,22 +21,26 @@ public class Notification implements ValidationHandler {
     }
 
     public static Notification create(final Throwable t) {
-        return create(new Error(t.getMessage()));
+        return create(new ValidationError(t.getMessage()));
     }
 
-    public static Notification create(final Error anError) {
+    public static Notification create(final ValidationError anError) {
         return new Notification(new ArrayList<>()).append(anError);
     }
 
+    public static Notification create(final List<ValidationError> errors) {
+        return new Notification(errors);
+    }
+
     @Override
-    public Notification append(final Error anError) {
+    public Notification append(final ValidationError anError) {
         this.errors.add(anError);
         return this;
     }
 
     @Override
     public ValidationHandler append(final String anError) {
-        return append(new Error(anError));
+        return append(new ValidationError(anError));
     }
 
     @Override
@@ -52,13 +56,13 @@ public class Notification implements ValidationHandler {
         } catch (final DomainException ex) {
             this.errors.addAll(ex.getErrors());
         } catch (final Throwable t) {
-            this.errors.add(new Error(t.getMessage()));
+            this.errors.add(new ValidationError(t.getMessage()));
         }
         return null;
     }
 
     @Override
-    public List<Error> getErrors() {
+    public List<ValidationError> getErrors() {
         return this.errors;
     }
 

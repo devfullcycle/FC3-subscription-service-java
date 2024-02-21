@@ -40,6 +40,10 @@ public enum Json {
                     DeserializationFeature.FAIL_ON_NULL_CREATOR_PROPERTIES,
                     SerializationFeature.WRITE_DATES_AS_TIMESTAMPS
             )
+            .featuresToEnable(
+                    DeserializationFeature.FAIL_ON_NUMBERS_FOR_ENUMS,
+                    DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL
+            )
             .modules(new JavaTimeModule(), new Jdk8Module(), afterburnerModule())
             .propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
             .build();

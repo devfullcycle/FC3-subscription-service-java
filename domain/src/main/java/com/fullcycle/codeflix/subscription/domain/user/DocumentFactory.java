@@ -1,7 +1,7 @@
 package com.fullcycle.codeflix.subscription.domain.user;
 
 import com.fullcycle.codeflix.subscription.domain.exceptions.DomainException;
-import com.fullcycle.codeflix.subscription.domain.validation.Error;
+import com.fullcycle.codeflix.subscription.domain.validation.ValidationError;
 
 public final class DocumentFactory {
 
@@ -9,7 +9,7 @@ public final class DocumentFactory {
         return switch (type) {
             case "cpf" -> new Document.Cpf(value);
             case "cnpj" -> new Document.Cnpj(value);
-            default -> throw DomainException.with(new Error("Invalid document type"));
+            default -> throw DomainException.with(new ValidationError("Invalid document type"));
         };
     }
 }

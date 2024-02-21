@@ -3,8 +3,6 @@ package com.fullcycle.codeflix.subscription.domain.subscription;
 import com.fullcycle.codeflix.subscription.domain.AggregateRoot;
 import com.fullcycle.codeflix.subscription.domain.plan.BillingCycle;
 import com.fullcycle.codeflix.subscription.domain.user.UserId;
-import com.fullcycle.codeflix.subscription.domain.validation.ValidationHandler;
-import com.fullcycle.codeflix.subscription.domain.validation.handler.Notification;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -39,16 +37,14 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
             final List<BillingHistory> billingHistories
     ) {
         super(subscriptionId);
-        var n = Notification.create();
         setUserId(userId);
         setVersion(version);
         setCreatedAt(createdAt);
         setUpdatedAt(updatedAt);
-        setBillingCycle(billingCycle, n);
-        setPrice(price, n);
+        setBillingCycle(billingCycle);
+        setPrice(price);
         setActive(active);
         setBillingHistories(billingHistories);
-        n.get("Invalid user subscription");
 //        registerEvent(new SubscriptionCreated());
     }
 
@@ -143,34 +139,32 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
     }
 
     public void setCreatedAt(final Instant createdAt) {
+        this.assertArgumentNotNull(createdAt, "'createdAt' is required");
         this.createdAt = createdAt;
     }
 
     public void setUpdatedAt(final Instant updatedAt) {
+        this.assertArgumentNotNull(updatedAt, "'updatedAt' is required");
         this.updatedAt = updatedAt;
     }
 
     private void setUserId(final UserId userId) {
+        this.assertArgumentNotNull(userId, "'userId' is required");
         this.userId = userId;
     }
 
     private void setVersion(int version) {
+        this.assertArgumentNotNull(version, "'version' is required");
         this.version = version;
     }
 
-    private void setBillingCycle(final BillingCycle billingCycle, final ValidationHandler v) {
-        if (billingCycle == null) {
-            v.append("'billingCycle' should not be null");
-            return;
-        }
+    private void setBillingCycle(final BillingCycle billingCycle) {
+        this.assertArgumentNotNull(billingCycle, "'billingCycle' is required");
         this.billingCycle = billingCycle;
     }
 
-    private void setPrice(final Double price, final ValidationHandler v) {
-        if (price == null) {
-            v.append("'price' should not be null");
-            return;
-        }
+    private void setPrice(final Double price) {
+        this.assertArgumentNotNull(price, "'price' is required");
         this.price = price;
     }
 

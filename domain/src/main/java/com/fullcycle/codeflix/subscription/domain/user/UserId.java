@@ -7,6 +7,6 @@ import java.util.Objects;
 public record UserId(String value) implements Identifier {
 
     public UserId {
-        Objects.requireNonNull(value);
+        this.assertArgumentNotNull(value, "'value' is required for user identifier");
     }
 }

@@ -14,7 +14,7 @@ import com.fullcycle.codeflix.subscription.domain.user.User;
 import com.fullcycle.codeflix.subscription.domain.user.UserGateway;
 import com.fullcycle.codeflix.subscription.domain.user.UserId;
 import com.fullcycle.codeflix.subscription.domain.utils.IdUtils;
-import com.fullcycle.codeflix.subscription.domain.validation.Error;
+import com.fullcycle.codeflix.subscription.domain.validation.ValidationError;
 
 import java.util.Objects;
 
@@ -68,7 +68,7 @@ public class RenewSubscription
     }
 
     private DomainException notFound(Class<? extends AggregateRoot<?>> clazz, Identifier id) {
-        return DomainException.with(new Error("%s with id %s was not found".formatted(clazz.getCanonicalName(), id.value())));
+        return DomainException.with(new ValidationError("%s with id %s was not found".formatted(clazz.getCanonicalName(), id.value())));
     }
 
     public record Input(String userId, String subscriptionId, String paymentType) {

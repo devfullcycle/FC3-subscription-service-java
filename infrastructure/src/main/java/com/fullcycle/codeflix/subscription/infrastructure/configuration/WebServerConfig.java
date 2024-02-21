@@ -8,12 +8,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 @Configuration(proxyBeanMethods = false)
 @ComponentScan("com.fullcycle.codeflix")
 @EnableScheduling
 public class WebServerConfig {
-
 
     @Bean
     @Profile("!test-integration && !test-e2e")
@@ -21,5 +21,10 @@ public class WebServerConfig {
         return ev -> {
             refreshClientCredentials.refresh();
         };
+    }
+
+    @Bean
+    public LocalValidatorFactoryBean validator() {
+        return new LocalValidatorFactoryBean();
     }
 }

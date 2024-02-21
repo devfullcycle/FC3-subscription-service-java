@@ -2,8 +2,6 @@ package com.fullcycle.codeflix.subscription.domain.plan;
 
 import com.fullcycle.codeflix.subscription.domain.AggregateRoot;
 import com.fullcycle.codeflix.subscription.domain.utils.IdUtils;
-import com.fullcycle.codeflix.subscription.domain.validation.ValidationHandler;
-import com.fullcycle.codeflix.subscription.domain.validation.handler.Notification;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -24,12 +22,10 @@ public class Plan extends AggregateRoot<PlanId> {
             final Boolean active
     ) {
         super(new PlanId(planId));
-        var n = Notification.create();
-        setName(name, n);
-        setDescription(description, n);
+        setName(name);
+        setDescription(description);
         setActive(active);
         setPricingModels(Collections.emptySet());
-        n.get("Invalid Plan");
     }
 
     public static Plan newPlan(
@@ -65,29 +61,24 @@ public class Plan extends AggregateRoot<PlanId> {
         return Collections.unmodifiableSet(pricingOptions);
     }
 
-    public ValidationHandler addPricingOption(final BillingCycle billingCycle, final Double price, final Boolean active) {
-        var n = Notification.create();
-        n.validate(() -> new PricingOption(billingCycle, price, active));
-        return n;
+    public Plan addPricingOption(final BillingCycle billingCycle, final Double price, final Boolean active) {
+        this.pricingOptions.add(new PricingOption(billingCycle, price, active));
+        return this;
     }
 
-    public void removePricingOption(final BillingCycle billingCycle, final Double price) {
+    public Plan removePricingOption(final BillingCycle billingCycle, final Double price) {
         this.pricingOptions.removeIf(it -> it.billingCycle() == billingCycle && Objects.equals(it.price(), price));
+        return this;
     }
 
-    private void setName(final String name, final ValidationHandler v) {
-        if (name == null || name.isBlank()) {
-            v.append("'name' should not be empty");
-            return;
-        }
+    private void setName(final String name) {
+        this.assertArgumentNotEmpty(name, "'name' is required");
+        this.assertArgumentMaxLength(name, 255, "'name' must have less than 255 characters");
         this.name = name;
     }
 
-    private void setDescription(final String description, final ValidationHandler v) {
-        if (description == null || description.isBlank()) {
-            v.append("'description' should not be empty");
-            return;
-        }
+    private void setDescription(final String description) {
+        this.assertArgumentNotEmpty(name, "'description' is required");
         this.description = description;
     }
 

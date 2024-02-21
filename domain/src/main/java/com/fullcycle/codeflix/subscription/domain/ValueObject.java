@@ -1,4 +1,4 @@
 package com.fullcycle.codeflix.subscription.domain;
 
-public abstract class ValueObject {
+public interface ValueObject extends AssertionConcern {
 }
