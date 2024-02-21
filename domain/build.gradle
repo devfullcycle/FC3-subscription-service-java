@@ -1,0 +1,25 @@
+plugins {
+    id 'java-conventions'
+    id 'java-library'
+}
+
+group 'com.fullcycle.codeflix.subscription.domain'
+
+dependencies {
+    testImplementation('net.datafaker:datafaker:1.9.0')
+}
+
+configurations {
+    testClasses {
+        extendsFrom(testImplementation)
+    }
+}
+
+task testJar(type: Jar) {
+    archiveClassifier.set('test')
+    from sourceSets.test.output
+}
+
+artifacts {
+    testClasses testJar
+}
