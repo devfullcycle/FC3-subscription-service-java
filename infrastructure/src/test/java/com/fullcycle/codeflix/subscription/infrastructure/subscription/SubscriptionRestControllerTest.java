@@ -2,7 +2,7 @@ package com.fullcycle.codeflix.subscription.infrastructure.subscription;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fullcycle.codeflix.subscription.ControllerTest;
-import com.fullcycle.codeflix.subscription.application.subscription.CreateSubscription;
+import com.fullcycle.codeflix.subscription.application.subscription.ActivateSubscription;
 import com.fullcycle.codeflix.subscription.domain.plan.BillingCycle;
 import com.fullcycle.codeflix.subscription.domain.utils.IdUtils;
 import com.fullcycle.codeflix.subscription.infrastructure.subscription.controllers.SubscriptionRestController;
@@ -33,7 +33,7 @@ class SubscriptionRestControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private CreateSubscription createSubscription;
+    private ActivateSubscription activateSubscription;
 
     @Test
     void whenPayloadIsValidThenShouldCallCreateSubscription() throws Exception {
@@ -53,8 +53,8 @@ class SubscriptionRestControllerTest {
                 }
                 """.formatted(expectedUserId, expectedPlanId, expectedBillingCycle.name(), expectedPrice);
 
-        when(createSubscription.execute(any()))
-                .thenReturn(new CreateSubscription.Output(expectedSubscription));
+        when(activateSubscription.execute(any()))
+                .thenReturn(new ActivateSubscription.Output(expectedSubscription));
 
         // when
         final var aRequest = post("/subscriptions")
@@ -70,9 +70,9 @@ class SubscriptionRestControllerTest {
                 .andExpect(jsonPath("$.subscription_id", equalTo(expectedSubscription)));
 
         // then
-        final var cmdCaptor = ArgumentCaptor.forClass(CreateSubscription.Command.class);
+        final var cmdCaptor = ArgumentCaptor.forClass(ActivateSubscription.Input.class);
 
-        verify(createSubscription).execute(cmdCaptor.capture());
+        verify(activateSubscription).execute(cmdCaptor.capture());
 
         final var actualCmd = cmdCaptor.getValue();
 

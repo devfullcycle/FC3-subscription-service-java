@@ -1,48 +1,40 @@
 package com.fullcycle.codeflix.subscription.domain.plan;
 
 import com.fullcycle.codeflix.subscription.domain.AggregateRoot;
-import com.fullcycle.codeflix.subscription.domain.utils.IdUtils;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
 
 public class Plan extends AggregateRoot<PlanId> {
 
     private String name;
     private String description;
+    private String groupId;
     private boolean active;
-    private Set<PricingOption> pricingOptions;
+    private Double price;
 
     private Plan(
-            final String planId,
+            final PlanId planId,
             final String name,
             final String description,
-            final Boolean active
+            final String groupId,
+            final Boolean active,
+            final Double price
     ) {
-        super(new PlanId(planId));
+        super(planId);
         setName(name);
         setDescription(description);
+        setGroupId(groupId);
         setActive(active);
-        setPricingModels(Collections.emptySet());
-    }
-
-    public static Plan newPlan(
-            final String name,
-            final String description,
-            final Boolean active
-    ) {
-        return new Plan(IdUtils.uniqueId(), name, description, active);
+        setPrice(price);
     }
 
     public static Plan with(
-            final String planId,
+            final PlanId planId,
             final String name,
             final String description,
-            final Boolean active
+            final String groupId,
+            final Boolean active,
+            final Double price
     ) {
-        return new Plan(planId, name, description, active);
+        return new Plan(planId, name, description, groupId, active, price);
     }
 
     public String name() {
@@ -57,18 +49,12 @@ public class Plan extends AggregateRoot<PlanId> {
         return active;
     }
 
-    public Set<PricingOption> pricingOptions() {
-        return Collections.unmodifiableSet(pricingOptions);
+    public Double price() {
+        return price;
     }
 
-    public Plan addPricingOption(final BillingCycle billingCycle, final Double price, final Boolean active) {
-        this.pricingOptions.add(new PricingOption(billingCycle, price, active));
-        return this;
-    }
-
-    public Plan removePricingOption(final BillingCycle billingCycle, final Double price) {
-        this.pricingOptions.removeIf(it -> it.billingCycle() == billingCycle && Objects.equals(it.price(), price));
-        return this;
+    public String groupId() {
+        return groupId;
     }
 
     private void setName(final String name) {
@@ -86,12 +72,13 @@ public class Plan extends AggregateRoot<PlanId> {
         this.active = active != null && active;
     }
 
-    private void setPricingModels(final Set<PricingOption> pricingOptions) {
-        this.pricingOptions = pricingOptions == null ? new HashSet<>() : new HashSet<>(pricingOptions);
+    private void setGroupId(final String groupId) {
+        this.assertArgumentNotEmpty(groupId, "'groupId' is required");
+        this.groupId = groupId;
     }
 
-    public boolean hasOption(BillingCycle billingCycle, Double price) {
-        return pricingOptions.stream()
-                .anyMatch(it -> it.billingCycle() == billingCycle && Objects.equals(it.price(), price));
+    private void setPrice(Double price) {
+        this.assertArgumentNotNull(price, "'price' should not be null");
+        this.price = price;
     }
 }

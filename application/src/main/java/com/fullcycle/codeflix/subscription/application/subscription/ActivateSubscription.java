@@ -5,6 +5,7 @@ import com.fullcycle.codeflix.subscription.domain.AggregateRoot;
 import com.fullcycle.codeflix.subscription.domain.Identifier;
 import com.fullcycle.codeflix.subscription.domain.exceptions.DomainException;
 import com.fullcycle.codeflix.subscription.domain.plan.BillingCycle;
+import com.fullcycle.codeflix.subscription.domain.plan.Plan;
 import com.fullcycle.codeflix.subscription.domain.plan.PlanGateway;
 import com.fullcycle.codeflix.subscription.domain.plan.PlanId;
 import com.fullcycle.codeflix.subscription.domain.subscription.Subscription;
@@ -16,14 +17,14 @@ import com.fullcycle.codeflix.subscription.domain.validation.ValidationError;
 
 import java.util.Objects;
 
-public class CreateSubscription
-        extends UseCase<CreateSubscription.Command, CreateSubscription.Output> {
+public class ActivateSubscription
+        extends UseCase<ActivateSubscription.Input, ActivateSubscription.Output> {
 
     private final PlanGateway planGateway;
     private final SubscriptionGateway subscriptionGateway;
     private final UserGateway userGateway;
 
-    public CreateSubscription(
+    public ActivateSubscription(
             final PlanGateway planGateway,
             final SubscriptionGateway subscriptionGateway,
             final UserGateway userGateway
@@ -34,39 +35,32 @@ public class CreateSubscription
     }
 
     @Override
-    public Output execute(final CreateSubscription.Command input) {
-        final var userId = new UserId(input.userId());
-        final var price = input.price();
-        final var billingCycle = input.billingCycle();
+    public Output execute(final Input in) {
+        final var userId = new UserId(in.userId());
+        final var planId = new PlanId(in.planId());
 
-        validatePlanOption(new PlanId(input.planId()), billingCycle, price);
+        this.planGateway.planOfId(planId)
+                .orElseThrow(() -> notFound(Plan.class, planId));
 
         final var user = userGateway.userOfId(userId)
                 .orElseThrow(() -> notFound(User.class, userId));
 
         final var subscription =
                 subscriptionGateway.subscriptionOfUser(userId)
-                        .orElseGet(() -> newSubscriptionWith(user, billingCycle, price));
+                        .orElseGet(() -> newSubscriptionWith(user, planId));
 
-        subscription.activateSubscription();
+        subscription.activate();
 
         subscriptionGateway.save(subscription);
 
         return new Output(subscription.id().value());
     }
 
-    private void validatePlanOption(final PlanId planId, final BillingCycle billingCycle, final Double price) {
-        planGateway.planOfId(planId)
-                .filter(it -> it.hasOption(billingCycle, price))
-                .orElseThrow(() -> DomainException.with(new ValidationError("Invalid plan or selected plan option")));
-    }
-
-    private Subscription newSubscriptionWith(final User user, final BillingCycle billingCycle, final Double price) {
+    private Subscription newSubscriptionWith(final User user, final PlanId planId) {
         return Subscription.newSubscription(
                 this.subscriptionGateway.nextId(),
                 user.id(),
-                billingCycle,
-                price,
+                planId,
                 true
         );
     }
@@ -75,11 +69,9 @@ public class CreateSubscription
         return DomainException.with(new ValidationError("%s with id %s was not found".formatted(clazz.getCanonicalName(), id.value())));
     }
 
-    public interface Command {
+    public interface Input {
         String userId();
         String planId();
-        BillingCycle billingCycle();
-        Double price();
     }
 
     public record Output(String subscriptionId) {

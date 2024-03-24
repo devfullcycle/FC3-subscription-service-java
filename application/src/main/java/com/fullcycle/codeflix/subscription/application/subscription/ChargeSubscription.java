@@ -5,8 +5,12 @@ import com.fullcycle.codeflix.subscription.domain.AggregateRoot;
 import com.fullcycle.codeflix.subscription.domain.AssertionConcern;
 import com.fullcycle.codeflix.subscription.domain.Identifier;
 import com.fullcycle.codeflix.subscription.domain.exceptions.DomainException;
+import com.fullcycle.codeflix.subscription.domain.payment.BillingAddress;
 import com.fullcycle.codeflix.subscription.domain.payment.Payment;
 import com.fullcycle.codeflix.subscription.domain.payment.PaymentGateway;
+import com.fullcycle.codeflix.subscription.domain.person.Address;
+import com.fullcycle.codeflix.subscription.domain.plan.Plan;
+import com.fullcycle.codeflix.subscription.domain.plan.PlanGateway;
 import com.fullcycle.codeflix.subscription.domain.subscription.Subscription;
 import com.fullcycle.codeflix.subscription.domain.subscription.SubscriptionGateway;
 import com.fullcycle.codeflix.subscription.domain.subscription.SubscriptionId;
@@ -16,55 +20,66 @@ import com.fullcycle.codeflix.subscription.domain.user.UserId;
 import com.fullcycle.codeflix.subscription.domain.utils.IdUtils;
 import com.fullcycle.codeflix.subscription.domain.validation.ValidationError;
 
+import java.time.LocalDate;
 import java.util.Objects;
 
-public class RenewSubscription
-        extends UseCase<RenewSubscription.Input, RenewSubscription.Output>
+public class ChargeSubscription
+        extends UseCase<ChargeSubscription.Input, ChargeSubscription.Output>
         implements AssertionConcern {
 
     private final PaymentGateway paymentGateway;
+    private final PlanGateway planGateway;
     private final SubscriptionGateway subscriptionGateway;
     private final UserGateway userGateway;
 
-    public RenewSubscription(
-            final PaymentGateway paymentGateway,
+    public ChargeSubscription(
+            final PaymentGateway paymentGateway, PlanGateway planGateway,
             final SubscriptionGateway subscriptionGateway,
             final UserGateway userGateway
     ) {
         this.paymentGateway = Objects.requireNonNull(paymentGateway);
+        this.planGateway = Objects.requireNonNull(planGateway);
         this.subscriptionGateway = Objects.requireNonNull(subscriptionGateway);
         this.userGateway = Objects.requireNonNull(userGateway);
     }
 
     @Override
-    public Output execute(final Input input) {
-        final var userId = new UserId(input.userId);
-        final var subscriptionId = new SubscriptionId(input.subscriptionId);
+    public Output execute(final Input in) {
+        final var userId = new UserId(in.userId);
+        final var subscriptionId = new SubscriptionId(in.subscriptionId);
 
         final var subscription =
                 subscriptionGateway.subscriptionOfId(subscriptionId)
                         .filter(it -> it.userId().equals(userId))
                         .orElseThrow(() -> notFound(Subscription.class, subscriptionId));
 
+        final var aPlan = this.planGateway.planOfId(subscription.planId())
+                .orElseThrow(() -> notFound(Plan.class, subscription.planId()));
+
         final var user = this.userGateway.userOfId(userId)
                 .orElseThrow(() -> notFound(User.class, userId));
 
-        final var transaction =
-                this.paymentGateway.processPayment(Payment.create(
-                        input.paymentType,
-                        subscription.price(),
-                        IdUtils.uniqueId(),
-                        user.address().zipcode(),
-                        user.address().number(),
-                        user.address().complement(),
-                        user.address().country()
-                ));
+        final var aPayment = this.newPaymentWith(in.paymentType(), aPlan.price(), user.billingAddress());
+        final var aTransaction = this.paymentGateway.processPayment(aPayment);
 
-        subscription.renewed(transaction.transactionId());
-
+        subscription.renewed(aPlan, aTransaction.transactionId());
         subscriptionGateway.save(subscription);
 
         return new Output(subscription.id().value());
+    }
+
+    private Payment newPaymentWith(final String paymentType, final Double price, final Address billingAddress) {
+        return Payment.create(
+                paymentType,
+                price,
+                IdUtils.uniqueId(),
+                new BillingAddress(
+                        billingAddress.zipcode(),
+                        billingAddress.number(),
+                        billingAddress.complement(),
+                        billingAddress.country()
+                )
+        );
     }
 
     private DomainException notFound(Class<? extends AggregateRoot<?>> clazz, Identifier id) {

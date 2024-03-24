@@ -3,56 +3,52 @@ package com.fullcycle.codeflix.subscription.domain.user;
 import com.fullcycle.codeflix.subscription.domain.AggregateRoot;
 import com.fullcycle.codeflix.subscription.domain.person.Address;
 import com.fullcycle.codeflix.subscription.domain.person.Document;
-import com.fullcycle.codeflix.subscription.domain.person.Email;
 
 public class User extends AggregateRoot<UserId> {
 
     private String firstname;
     private String lastname;
-    private Email email;
-    private Address address;
+    private Address billingAddress;
     private Document document;
 
     private User(
             final UserId userId,
             final String firstname,
             final String lastname,
-            final String email,
             final String documentNumber,
             final String documentType
     ) {
         super(userId);
         setFirstname(firstname);
         setLastname(lastname);
-        setEmail(email);
         setDocument(documentType, documentNumber);
     }
 
     private User(
             final UserId userId,
-            final String firstname, final String lastname, final String email,
+            final String firstname, final String lastname,
             final Address address,
             final String documentNumber, final String documentType
     ) {
-        this(userId, firstname, lastname, email, documentNumber, documentType);
-        setAddress(address);
+        this(userId, firstname, lastname, documentNumber, documentType);
+        setBillingAddress(address);
     }
 
     public static User newUser(
             final UserId userId,
-            final String firstname, final String lastname, final String email,
+            final String firstname, final String lastname,
             final String documentNumber, final String documentType
     ) {
-        return new User(userId, firstname, lastname, email, documentNumber, documentType);
+        return new User(userId, firstname, lastname, documentNumber, documentType);
     }
 
     public static User with(
             final UserId userId,
-            final String firstname, final String lastname, final String email,
-            final Address address,
+            final String firstname, final String lastname,
+            final Address billingAddress,
             final String documentNumber, final String documentType
     ) {
-        return new User(userId, firstname, lastname, email, address, documentNumber, documentType);
+        return new User(userId, firstname, lastname, billingAddress, documentNumber, documentType);
     }
 
     public String firstname() {
@@ -63,12 +59,8 @@ public class User extends AggregateRoot<UserId> {
         return lastname;
     }
 
-    public Email email() {
-        return email;
-    }
-
-    public Address address() {
-        return address;
+    public Address billingAddress() {
+        return billingAddress;
     }
 
     public Document document() {
@@ -89,13 +81,9 @@ public class User extends AggregateRoot<UserId> {
         this.lastname = lastname;
     }
 
-    public void setEmail(final String email) {
-        this.email = new Email(email);
-    }
-
-    private void setAddress(final Address address) {
-        this.assertArgumentNotNull(address, "'address' should not be null");
-        this.address = address;
+    private void setBillingAddress(final Address billingAddress) {
+        this.assertArgumentNotNull(billingAddress, "'billingAddress' should not be null");
+        this.billingAddress = billingAddress;
     }
 
     private void setDocument(final String documentType, final String documentValue) {

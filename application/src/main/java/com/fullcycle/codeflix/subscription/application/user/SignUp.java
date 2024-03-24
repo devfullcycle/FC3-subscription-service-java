@@ -6,40 +6,33 @@ import com.fullcycle.codeflix.subscription.domain.person.Email;
 import com.fullcycle.codeflix.subscription.domain.user.EmailAlreadyRegistered;
 import com.fullcycle.codeflix.subscription.domain.user.User;
 import com.fullcycle.codeflix.subscription.domain.user.UserGateway;
+import com.fullcycle.codeflix.subscription.domain.user.UserId;
 
 import java.util.Objects;
 
-public class SignUp extends UseCase<SignUp.Command, SignUp.Output> {
+public class SignUp extends UseCase<SignUp.Input, SignUp.Output> {
 
-    private final IdentityGateway identityGateway;
     private final UserGateway userGateway;
 
-    public SignUp(final IdentityGateway identityGateway, final UserGateway userGateway) {
-        this.identityGateway = Objects.requireNonNull(identityGateway);
+    public SignUp(final UserGateway userGateway) {
         this.userGateway = Objects.requireNonNull(userGateway);
     }
 
     @Override
-    public Output execute(final Command cmd) {
-        if (this.userGateway.existsByEmail(new Email(cmd.email()))) {
-            throw new EmailAlreadyRegistered();
-        }
-
-        final var aUser = this.newUserWith(cmd);
+    public Output execute(final Input in) {
+        final var aUser = this.newUserWith(in);
         this.userGateway.create(aUser);
         return new Output(aUser);
     }
 
-    private User newUserWith(final Command cmd) {
-        final var userId = this.userGateway.nextId();
-        return User.newUser(userId, cmd.firstname(), cmd.lastname(), cmd.email(), cmd.documentNumber(), cmd.documentType());
+    private User newUserWith(final Input in) {
+        return User.newUser(new UserId(in.iamUserId()), in.firstname(), in.lastname(), in.documentNumber(), in.documentType());
     }
 
-    public interface Command {
+    public interface Input {
+        String iamUserId();
         String firstname();
         String lastname();
-        String email();
-        String password();
         String documentNumber();
         String documentType();
     }

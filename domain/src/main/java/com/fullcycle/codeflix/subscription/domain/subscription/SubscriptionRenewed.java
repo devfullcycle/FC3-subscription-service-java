@@ -1,27 +1,36 @@
 package com.fullcycle.codeflix.subscription.domain.subscription;
 
 import com.fullcycle.codeflix.subscription.domain.DomainEvent;
+import com.fullcycle.codeflix.subscription.domain.plan.Plan;
+import com.fullcycle.codeflix.subscription.domain.plan.PlanId;
+import com.fullcycle.codeflix.subscription.domain.subscription.billing.BillingRecord;
+import com.fullcycle.codeflix.subscription.domain.user.UserId;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Map;
 
 public class SubscriptionRenewed extends DomainEvent {
 
     private static final int VERSION = 0;
-    private final String subscriptionId;
-    private final String userId;
+    private final SubscriptionId subscriptionId;
+    private final UserId userId;
+    private final PlanId planId;
     private final String transactionId;
-    private final String billingCycle;
+    private final LocalDate dueDate;
     private final Double price;
+    private final Instant renewedAt;
 
-    public SubscriptionRenewed(final Subscription subscription, final BillingHistory record) {
+    public SubscriptionRenewed(final Subscription subscription, final Plan plan, final String transactionId) {
         super(VERSION, subscription.id().value());
-        this.subscriptionId = subscription.id().value();
-        this.userId = subscription.userId().value();
-        this.transactionId = record.transactionId();
-        this.billingCycle = record.billingCycle().name();
-        this.price = record.amount();
+        this.subscriptionId = subscription.id();
+        this.userId = subscription.userId();
+        this.planId = plan.id();
+        this.price = plan.price();
+        this.transactionId = transactionId;
+        this.dueDate = subscription.dueDate();
+        this.renewedAt = subscription.lastRenewDate();
     }
 
     private SubscriptionRenewed(
@@ -29,18 +38,22 @@ public class SubscriptionRenewed extends DomainEvent {
             final int eventVersion,
             final String aggregateId,
             final Instant occurredOn,
-            final String subscriptionId,
-            final String userId,
+            final SubscriptionId subscriptionId,
+            final UserId userId,
+            final PlanId planId,
             final String transactionId,
-            final String billingCycle,
-            final Double price
+            final LocalDate dueDate,
+            final Double price,
+            final Instant renewedAt
     ) {
         super(eventId, eventVersion, aggregateId, occurredOn);
         this.subscriptionId = subscriptionId;
         this.userId = userId;
         this.transactionId = transactionId;
-        this.billingCycle = billingCycle;
+        this.planId = planId;
         this.price = price;
+        this.dueDate = dueDate;
+        this.renewedAt = renewedAt;
     }
 
     public static SubscriptionRenewed restore(
@@ -53,9 +66,11 @@ public class SubscriptionRenewed extends DomainEvent {
         final var userId = (String) payload.get("userId");
         final var subscriptionId = (String) payload.get("subscriptionId");
         final var transactionId = (String) payload.get("transactionId");
-        final var billingCycle = (String) payload.get("billingCycle");
+        final var planId = (String) payload.get("planId");
+        final var dueDate = (LocalDate) payload.get("dueDate");
         final var price = (Double) payload.get("price");
-        return new SubscriptionRenewed(eventId, eventVersion, aggregateId, occurredOn, userId, subscriptionId, transactionId, billingCycle, price);
+        final var renewedAt = (Instant) payload.get("renewedAt");
+        return new SubscriptionRenewed(eventId, eventVersion, aggregateId, occurredOn, new SubscriptionId(subscriptionId), new UserId(userId), new PlanId(planId), transactionId, dueDate, price, renewedAt);
     }
 
     @Override
@@ -66,11 +81,13 @@ public class SubscriptionRenewed extends DomainEvent {
     @Override
     public Map<String, Serializable> payload() {
         return Map.of(
-                "subscriptionId", subscriptionId,
-                "userId", userId,
+                "subscriptionId", subscriptionId.value(),
+                "userId", userId.value(),
+                "planId", planId.value(),
                 "transactionId", transactionId,
-                "billingCycle", billingCycle,
-                "price", price
+                "dueDate", dueDate,
+                "price", price,
+                "renewedAt", renewedAt
         );
     }
 }

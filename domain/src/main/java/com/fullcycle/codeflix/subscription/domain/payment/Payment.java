@@ -12,11 +12,8 @@ public interface Payment {
             final String paymentType,
             final Double amount,
             final String orderId,
-            final String zipcode,
-            final String number,
-            final String complement,
-            final String country
+            final BillingAddress billingAddress
     ) {
-        return PaymentFactory.create(paymentType, amount, orderId, zipcode, number, complement, country);
+        return PaymentFactory.create(paymentType, amount, orderId, billingAddress);
     }
 }

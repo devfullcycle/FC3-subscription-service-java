@@ -6,14 +6,11 @@ public final class PaymentFactory {
             final String paymentType,
             final Double amount,
             final String orderId,
-            final String zipcode,
-            final String number,
-            final String complement,
-            final String country
+            final BillingAddress billingAddress
     ) {
         return switch (paymentType) {
-            case "pix" -> new PixPayment(amount, orderId, zipcode, number, complement, country);
-            case "credit_card" -> new CreditCardPayment(amount, orderId, zipcode, number, complement, country);
+            case "pix" -> new PixPayment(amount, orderId, billingAddress);
+            case "credit_card" -> new CreditCardPayment(amount, orderId, billingAddress);
             default -> throw new IllegalArgumentException("");
         };
     }

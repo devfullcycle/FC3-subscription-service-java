@@ -11,14 +11,11 @@ public class PixPayment implements Payment, AssertionConcern {
     public PixPayment(
             final Double amount,
             final String orderId,
-            final String zipcode,
-            final String number,
-            final String complement,
-            final String country
+            final BillingAddress billingAddress
     ) {
         this.amount = amount;
         this.orderId = orderId;
-        this.address = new BillingAddress(zipcode, number, complement, country);
+        this.address = billingAddress;
     }
 
     @Override

@@ -2,9 +2,15 @@ package com.fullcycle.codeflix.subscription.domain.subscription;
 
 import com.fullcycle.codeflix.subscription.domain.AggregateRoot;
 import com.fullcycle.codeflix.subscription.domain.plan.BillingCycle;
+import com.fullcycle.codeflix.subscription.domain.plan.Plan;
+import com.fullcycle.codeflix.subscription.domain.plan.PlanGateway;
+import com.fullcycle.codeflix.subscription.domain.plan.PlanId;
+import com.fullcycle.codeflix.subscription.domain.subscription.billing.BillingDetailsId;
+import com.fullcycle.codeflix.subscription.domain.subscription.billing.BillingRecord;
 import com.fullcycle.codeflix.subscription.domain.user.UserId;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,95 +21,102 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
 
     private static final int FIRST_VERSION = 0;
 
+    private PlanId planId;
     private UserId userId;
     private int version;
     private Instant createdAt;
     private Instant updatedAt;
-
-    private BillingCycle billingCycle;
-    private Double price;
+    private LocalDate dueDate;
     private boolean active;
-    private List<BillingHistory> billingHistories;
+    private Instant lastRenewDate;
+    private String lastTransactionId;
 
     private Subscription(
             final SubscriptionId subscriptionId,
             final UserId userId,
+            final PlanId planId,
             final int version,
             final Instant createdAt,
             final Instant updatedAt,
-            final BillingCycle billingCycle,
-            final Double price,
             final Boolean active,
-            final List<BillingHistory> billingHistories
+            final LocalDate dueDate,
+            final Instant lastRenewDate,
+            final String lastTransactionId
     ) {
         super(subscriptionId);
         setUserId(userId);
+        setPlanId(planId);
         setVersion(version);
         setCreatedAt(createdAt);
         setUpdatedAt(updatedAt);
-        setBillingCycle(billingCycle);
-        setPrice(price);
         setActive(active);
-        setBillingHistories(billingHistories);
-//        registerEvent(new SubscriptionCreated());
+        setDueDate(dueDate);
+        setLastRenewDate(lastRenewDate);
+        setLastTransactionId(lastTransactionId);
     }
 
     public static Subscription newSubscription(
             final SubscriptionId subscriptionId,
             final UserId userId,
-            final BillingCycle billingCycle,
-            final Double price,
+            final PlanId planId,
             final Boolean active
     ) {
         final var now = now();
         return new Subscription(
                 subscriptionId,
                 userId,
+                planId,
                 FIRST_VERSION,
                 now,
                 now,
-                billingCycle,
-                price,
                 active,
-                Collections.emptyList()
+                null,
+                null,
+                null
         );
     }
 
     public static Subscription with(
             final SubscriptionId subscriptionId,
             final UserId userId,
+            final PlanId planId,
             final int version,
             final Instant createdAt,
             final Instant updatedAt,
-            final BillingCycle billingCycle,
-            final Double price,
             final Boolean active,
-            final List<BillingHistory> billingHistories
+            final LocalDate dueDate,
+            final Instant lastRenewDate,
+            final String lastTransactionId
     ) {
         return new Subscription(
                 subscriptionId,
                 userId,
+                planId,
                 version,
                 createdAt,
                 updatedAt,
-                billingCycle,
-                price,
                 active,
-                billingHistories
+                dueDate,
+                lastRenewDate,
+                lastTransactionId
         );
     }
 
-    public Subscription activateSubscription() {
+    public Subscription activate() {
         this.setActive(true);
+        this.setDueDate(LocalDate.now().minusDays(1));
         this.registerEvent(new SubscriptionActivated(this));
         return this;
     }
 
-    public BillingHistory renewed(final String transactionId) {
-        final var record = new BillingHistory(transactionId, now(), this.billingCycle, this.price);
-        this.billingHistories.add(record);
-        this.registerEvent(new SubscriptionRenewed(this, record));
-        return record;
+    public Subscription renewed(final Plan plan, final String transactionId) {
+        this.assertArgumentNotEmpty(transactionId, "'transactionId' should not be empty");
+
+        this.setDueDate((dueDate != null ? dueDate : LocalDate.now()).plusMonths(1));
+        this.setLastRenewDate(Instant.now());
+        this.setLastTransactionId(transactionId);
+        this.registerEvent(new SubscriptionRenewed(this, plan, transactionId));
+        return this;
     }
 
     public UserId userId() {
@@ -122,20 +135,24 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
         return updatedAt;
     }
 
-    public BillingCycle billingCycle() {
-        return billingCycle;
-    }
-
-    public Double price() {
-        return price;
-    }
-
     public boolean active() {
         return active;
     }
 
-    public List<BillingHistory> billingHistories() {
-        return Collections.unmodifiableList(billingHistories);
+    public PlanId planId() {
+        return planId;
+    }
+
+    public LocalDate dueDate() {
+        return dueDate;
+    }
+
+    public Instant lastRenewDate() {
+        return lastRenewDate;
+    }
+
+    public String lastTransactionId() {
+        return lastTransactionId;
     }
 
     public void setCreatedAt(final Instant createdAt) {
@@ -158,21 +175,24 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
         this.version = version;
     }
 
-    private void setBillingCycle(final BillingCycle billingCycle) {
-        this.assertArgumentNotNull(billingCycle, "'billingCycle' is required");
-        this.billingCycle = billingCycle;
-    }
-
-    private void setPrice(final Double price) {
-        this.assertArgumentNotNull(price, "'price' is required");
-        this.price = price;
-    }
-
     private void setActive(final Boolean active) {
         this.active = active != null && active;
     }
 
-    private void setBillingHistories(final List<BillingHistory> billingHistories) {
-        this.billingHistories = billingHistories == null ? new LinkedList<>() : new LinkedList<>(billingHistories);
+    private void setPlanId(final PlanId planId) {
+        this.assertArgumentNotNull(planId, "'plan' is required");
+        this.planId = planId;
+    }
+
+    private void setDueDate(final LocalDate dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    private void setLastRenewDate(Instant lastRenewDate) {
+        this.lastRenewDate = lastRenewDate;
+    }
+
+    private void setLastTransactionId(String lastTransactionId) {
+        this.lastTransactionId = lastTransactionId;
     }
 }
