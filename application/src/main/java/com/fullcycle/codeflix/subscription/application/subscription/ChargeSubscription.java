@@ -20,7 +20,6 @@ import com.fullcycle.codeflix.subscription.domain.user.UserId;
 import com.fullcycle.codeflix.subscription.domain.utils.IdUtils;
 import com.fullcycle.codeflix.subscription.domain.validation.ValidationError;
 
-import java.time.LocalDate;
 import java.util.Objects;
 
 public class ChargeSubscription
@@ -62,7 +61,7 @@ public class ChargeSubscription
         final var aPayment = this.newPaymentWith(in.paymentType(), aPlan.price(), user.billingAddress());
         final var aTransaction = this.paymentGateway.processPayment(aPayment);
 
-        subscription.renewed(aPlan, aTransaction.transactionId());
+        subscription.renew(aPlan, aTransaction.transactionId());
         subscriptionGateway.save(subscription);
 
         return new Output(subscription.id().value());

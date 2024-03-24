@@ -1,25 +1,19 @@
 package com.fullcycle.codeflix.subscription.domain.subscription;
 
 import com.fullcycle.codeflix.subscription.domain.AggregateRoot;
-import com.fullcycle.codeflix.subscription.domain.plan.BillingCycle;
 import com.fullcycle.codeflix.subscription.domain.plan.Plan;
-import com.fullcycle.codeflix.subscription.domain.plan.PlanGateway;
 import com.fullcycle.codeflix.subscription.domain.plan.PlanId;
-import com.fullcycle.codeflix.subscription.domain.subscription.billing.BillingDetailsId;
-import com.fullcycle.codeflix.subscription.domain.subscription.billing.BillingRecord;
 import com.fullcycle.codeflix.subscription.domain.user.UserId;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 
 import static com.fullcycle.codeflix.subscription.domain.utils.InstantUtils.now;
 
 public class Subscription extends AggregateRoot<SubscriptionId> {
 
     private static final int FIRST_VERSION = 0;
+    public static final int TRIAL_MONTHS = 1;
 
     private PlanId planId;
     private UserId userId;
@@ -27,7 +21,7 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
     private Instant createdAt;
     private Instant updatedAt;
     private LocalDate dueDate;
-    private boolean active;
+    private Status status;
     private Instant lastRenewDate;
     private String lastTransactionId;
 
@@ -38,7 +32,7 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
             final int version,
             final Instant createdAt,
             final Instant updatedAt,
-            final Boolean active,
+            final Status status,
             final LocalDate dueDate,
             final Instant lastRenewDate,
             final String lastTransactionId
@@ -49,7 +43,7 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
         setVersion(version);
         setCreatedAt(createdAt);
         setUpdatedAt(updatedAt);
-        setActive(active);
+        setStatus(status);
         setDueDate(dueDate);
         setLastRenewDate(lastRenewDate);
         setLastTransactionId(lastTransactionId);
@@ -58,8 +52,7 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
     public static Subscription newSubscription(
             final SubscriptionId subscriptionId,
             final UserId userId,
-            final PlanId planId,
-            final Boolean active
+            final PlanId planId
     ) {
         final var now = now();
         return new Subscription(
@@ -69,7 +62,7 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
                 FIRST_VERSION,
                 now,
                 now,
-                active,
+                Status.PENDING_PAYMENT,
                 null,
                 null,
                 null
@@ -83,7 +76,7 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
             final int version,
             final Instant createdAt,
             final Instant updatedAt,
-            final Boolean active,
+            final Status status,
             final LocalDate dueDate,
             final Instant lastRenewDate,
             final String lastTransactionId
@@ -95,7 +88,7 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
                 version,
                 createdAt,
                 updatedAt,
-                active,
+                status,
                 dueDate,
                 lastRenewDate,
                 lastTransactionId
@@ -103,19 +96,27 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
     }
 
     public Subscription activate() {
-        this.setActive(true);
-        this.setDueDate(LocalDate.now().minusDays(1));
+        if (this.dueDate == null) {
+            setDueDate(LocalDate.now().plusMonths(TRIAL_MONTHS));
+        }
+        this.setStatus(Status.PENDING_PAYMENT);
         this.registerEvent(new SubscriptionActivated(this));
         return this;
     }
 
-    public Subscription renewed(final Plan plan, final String transactionId) {
+    public Subscription renew(final Plan plan, final String transactionId) {
         this.assertArgumentNotEmpty(transactionId, "'transactionId' should not be empty");
-
+        this.setStatus(Status.PAID);
         this.setDueDate((dueDate != null ? dueDate : LocalDate.now()).plusMonths(1));
         this.setLastRenewDate(Instant.now());
         this.setLastTransactionId(transactionId);
         this.registerEvent(new SubscriptionRenewed(this, plan, transactionId));
+        return this;
+    }
+
+    public Subscription active() {
+        this.setStatus(Status.ACTIVE);
+        this.registerEvent(new SubscriptionActivated(this));
         return this;
     }
 
@@ -135,8 +136,8 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
         return updatedAt;
     }
 
-    public boolean active() {
-        return active;
+    public Status status() {
+        return status;
     }
 
     public PlanId planId() {
@@ -175,13 +176,14 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
         this.version = version;
     }
 
-    private void setActive(final Boolean active) {
-        this.active = active != null && active;
-    }
-
     private void setPlanId(final PlanId planId) {
         this.assertArgumentNotNull(planId, "'plan' is required");
         this.planId = planId;
+    }
+
+    public void setStatus(final Status status) {
+        this.assertArgumentNotNull(status, "'status' is required");
+        this.status = status;
     }
 
     private void setDueDate(final LocalDate dueDate) {

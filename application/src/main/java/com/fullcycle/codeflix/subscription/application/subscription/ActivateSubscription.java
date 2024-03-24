@@ -60,8 +60,7 @@ public class ActivateSubscription
         return Subscription.newSubscription(
                 this.subscriptionGateway.nextId(),
                 user.id(),
-                planId,
-                true
+                planId
         );
     }
 
