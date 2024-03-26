@@ -21,6 +21,10 @@ public class DomainException extends NoStacktraceException {
         return new DomainException("", anErrors);
     }
 
+    public static DomainException with(final String property, final String error) {
+        return DomainException.with(new ValidationError(property, error));
+    }
+
     public List<ValidationError> getErrors() {
         return errors;
     }

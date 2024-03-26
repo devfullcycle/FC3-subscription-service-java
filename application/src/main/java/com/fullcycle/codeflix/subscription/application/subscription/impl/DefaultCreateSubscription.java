@@ -1,10 +1,9 @@
-package com.fullcycle.codeflix.subscription.application.subscription;
+package com.fullcycle.codeflix.subscription.application.subscription.impl;
 
-import com.fullcycle.codeflix.subscription.application.UseCase;
+import com.fullcycle.codeflix.subscription.application.subscription.CreateSubscription;
 import com.fullcycle.codeflix.subscription.domain.AggregateRoot;
 import com.fullcycle.codeflix.subscription.domain.Identifier;
 import com.fullcycle.codeflix.subscription.domain.exceptions.DomainException;
-import com.fullcycle.codeflix.subscription.domain.plan.BillingCycle;
 import com.fullcycle.codeflix.subscription.domain.plan.Plan;
 import com.fullcycle.codeflix.subscription.domain.plan.PlanGateway;
 import com.fullcycle.codeflix.subscription.domain.plan.PlanId;
@@ -17,14 +16,13 @@ import com.fullcycle.codeflix.subscription.domain.validation.ValidationError;
 
 import java.util.Objects;
 
-public class ActivateSubscription
-        extends UseCase<ActivateSubscription.Input, ActivateSubscription.Output> {
+public class DefaultCreateSubscription extends CreateSubscription {
 
     private final PlanGateway planGateway;
     private final SubscriptionGateway subscriptionGateway;
     private final UserGateway userGateway;
 
-    public ActivateSubscription(
+    public DefaultCreateSubscription(
             final PlanGateway planGateway,
             final SubscriptionGateway subscriptionGateway,
             final UserGateway userGateway
@@ -45,15 +43,14 @@ public class ActivateSubscription
         final var user = userGateway.userOfId(userId)
                 .orElseThrow(() -> notFound(User.class, userId));
 
-        final var subscription =
-                subscriptionGateway.subscriptionOfUser(userId)
-                        .orElseGet(() -> newSubscriptionWith(user, planId));
+        subscriptionGateway.subscriptionOfUser(userId).ifPresent(s -> {
+            throw DomainException.with("", "");
+        });
 
-        subscription.activate();
-
+        final var subscription = newSubscriptionWith(user, planId);
         subscriptionGateway.save(subscription);
 
-        return new Output(subscription.id().value());
+        return new StdOutput(subscription.id().value());
     }
 
     private Subscription newSubscriptionWith(final User user, final PlanId planId) {
@@ -68,12 +65,7 @@ public class ActivateSubscription
         return DomainException.with(new ValidationError("%s with id %s was not found".formatted(clazz.getCanonicalName(), id.value())));
     }
 
-    public interface Input {
-        String userId();
-        String planId();
-    }
-
-    public record Output(String subscriptionId) {
+    record StdOutput(String subscriptionId) implements Output {
 
     }
 }

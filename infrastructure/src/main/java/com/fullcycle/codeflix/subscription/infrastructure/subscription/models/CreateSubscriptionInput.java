@@ -1,6 +1,6 @@
-package com.fullcycle.codeflix.subscription.infrastructure.subscription.commands;
+package com.fullcycle.codeflix.subscription.infrastructure.subscription.models;
 
-import com.fullcycle.codeflix.subscription.application.subscription.ActivateSubscription;
+import com.fullcycle.codeflix.subscription.application.subscription.CreateSubscription;
 import com.fullcycle.codeflix.subscription.domain.plan.BillingCycle;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -10,6 +10,6 @@ public record CreateSubscriptionInput(
         @NotEmpty String planId,
         @NotNull BillingCycle billingCycle,
         @NotNull Double price
-) implements ActivateSubscription.Input {
+) implements CreateSubscription.Input {
 
 }

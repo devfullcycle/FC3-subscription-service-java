@@ -1,7 +1,7 @@
 package com.fullcycle.codeflix.subscription.infrastructure.subscription;
 
-import com.fullcycle.codeflix.subscription.application.subscription.ActivateSubscription;
-import com.fullcycle.codeflix.subscription.infrastructure.subscription.commands.CreateSubscriptionInput;
+import com.fullcycle.codeflix.subscription.application.subscription.CreateSubscription;
+import com.fullcycle.codeflix.subscription.infrastructure.subscription.models.CreateSubscriptionInput;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -27,6 +27,6 @@ public interface SubscriptionRestAPI {
             @ApiResponse(responseCode = "422", description = "A validation error was thrown"),
             @ApiResponse(responseCode = "500", description = "An internal server error was thrown"),
     })
-    ResponseEntity<ActivateSubscription.Output> createSubscription(@RequestBody @Valid CreateSubscriptionInput cmd);
+    ResponseEntity<CreateSubscription.Output> createSubscription(@RequestBody @Valid CreateSubscriptionInput cmd);
 
 }

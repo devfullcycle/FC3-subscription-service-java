@@ -1,36 +1,19 @@
 package com.fullcycle.codeflix.subscription.application.plan;
 
 import com.fullcycle.codeflix.subscription.application.UseCase;
-import com.fullcycle.codeflix.subscription.domain.plan.Plan;
-import com.fullcycle.codeflix.subscription.domain.plan.PlanGateway;
-import com.fullcycle.codeflix.subscription.domain.plan.PlanId;
 
-import java.util.Objects;
+public abstract class CreatePlan extends UseCase<CreatePlan.Input, CreatePlan.Output> {
 
-public class CreatePlan extends UseCase<CreatePlan.Command, CreatePlan.Output> {
-
-    private final PlanGateway planGateway;
-
-    public CreatePlan(final PlanGateway planGateway) {
-        this.planGateway = Objects.requireNonNull(planGateway);
-    }
-
-    @Override
-    public Output execute(final Command cmd) {
-        final var aPlan = Plan.newPlan(cmd.name(), cmd.description(), cmd.active());
-        this.planGateway.save(aPlan);
-        return new Output(aPlan.id());
-    }
-
-    public interface Command {
+    public interface Input {
         String name();
         String description();
+        Double price();
+        String currency();
+        String groupId();
         boolean active();
     }
 
-    public record Output(String planId) {
-        public Output(PlanId id) {
-            this(id.value());
-        }
+    public interface Output {
+        String planId();
     }
 }

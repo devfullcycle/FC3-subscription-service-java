@@ -1,6 +1,7 @@
 package com.fullcycle.codeflix.subscription.domain.plan;
 
 import com.fullcycle.codeflix.subscription.domain.AggregateRoot;
+import com.fullcycle.codeflix.subscription.domain.monetary.MonetaryAmount;
 
 public class Plan extends AggregateRoot<PlanId> {
 
@@ -8,7 +9,7 @@ public class Plan extends AggregateRoot<PlanId> {
     private String description;
     private String groupId;
     private boolean active;
-    private Double price;
+    private MonetaryAmount price;
 
     private Plan(
             final PlanId planId,
@@ -16,6 +17,7 @@ public class Plan extends AggregateRoot<PlanId> {
             final String description,
             final String groupId,
             final Boolean active,
+            final String currency,
             final Double price
     ) {
         super(planId);
@@ -23,7 +25,7 @@ public class Plan extends AggregateRoot<PlanId> {
         setDescription(description);
         setGroupId(groupId);
         setActive(active);
-        setPrice(price);
+        setPrice(new MonetaryAmount(price, currency));
     }
 
     public static Plan with(
@@ -32,9 +34,10 @@ public class Plan extends AggregateRoot<PlanId> {
             final String description,
             final String groupId,
             final Boolean active,
+            final String currency,
             final Double price
     ) {
-        return new Plan(planId, name, description, groupId, active, price);
+        return new Plan(planId, name, description, groupId, active, currency, price);
     }
 
     public String name() {
@@ -49,7 +52,7 @@ public class Plan extends AggregateRoot<PlanId> {
         return active;
     }
 
-    public Double price() {
+    public MonetaryAmount price() {
         return price;
     }
 
@@ -77,7 +80,7 @@ public class Plan extends AggregateRoot<PlanId> {
         this.groupId = groupId;
     }
 
-    private void setPrice(Double price) {
+    private void setPrice(final MonetaryAmount price) {
         this.assertArgumentNotNull(price, "'price' should not be null");
         this.price = price;
     }
