@@ -4,11 +4,9 @@ import com.fullcycle.codeflix.subscription.domain.subscription.Subscription;
 
 public record TrailingSubscriptionStatus(Subscription subscription) implements SubscriptionStatus {
 
-    private static final String VALUE = "trailing";
-
     @Override
     public String value() {
-        return VALUE;
+        return SubscriptionStatus.TRAILING;
     }
 
     @Override
@@ -27,7 +25,7 @@ public record TrailingSubscriptionStatus(Subscription subscription) implements S
     }
 
     @Override
-    public void canceled() {
+    public void cancel() {
         this.subscription.setStatus(new CanceledSubscriptionStatus(subscription));
     }
 }

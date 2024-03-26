@@ -1,3 +1,7 @@
+logging:
+  level:
+    org.springframework.boot.autoconfigure: DEBUG
+
 keycloak:
   client-id: fc3-app
   client-secret: seecret

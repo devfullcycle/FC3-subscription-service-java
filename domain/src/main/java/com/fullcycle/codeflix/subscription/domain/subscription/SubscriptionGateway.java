@@ -10,7 +10,7 @@ public interface SubscriptionGateway {
 
     Optional<Subscription> subscriptionOfId(SubscriptionId subscriptionId);
 
-    Optional<Subscription> subscriptionOfUser(UserId userId);
+    Optional<Subscription> latestSubscriptionOfUser(UserId userId);
 
     Subscription save(Subscription subscription);
 

@@ -5,11 +5,9 @@ import com.fullcycle.codeflix.subscription.domain.subscription.Subscription;
 
 public record CanceledSubscriptionStatus(Subscription subscription) implements SubscriptionStatus {
 
-    private static final String VALUE = "canceled";
-
     @Override
     public String value() {
-        return VALUE;
+        return SubscriptionStatus.CANCELED;
     }
 
     @Override
@@ -28,7 +26,7 @@ public record CanceledSubscriptionStatus(Subscription subscription) implements S
     }
 
     @Override
-    public void canceled() {
+    public void cancel() {
         // Do nothing
     }
 }

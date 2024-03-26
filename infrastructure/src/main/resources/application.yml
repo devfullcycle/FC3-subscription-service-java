@@ -21,6 +21,9 @@ server:
       io: 4 # One IO thread per CPU core is a reasonable default: https://undertow.io/undertow-docs/undertow-docs-2.1.0/index.html#listeners-2
 
 spring:
+  cache:
+    type: simple
+    cache-names: keycloak
   servlet:
     multipart:
       max-file-size: 10GB # Max file size.

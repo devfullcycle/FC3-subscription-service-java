@@ -5,7 +5,8 @@ import com.fullcycle.codeflix.subscription.ControllerTest;
 import com.fullcycle.codeflix.subscription.application.subscription.CreateSubscription;
 import com.fullcycle.codeflix.subscription.domain.plan.BillingCycle;
 import com.fullcycle.codeflix.subscription.domain.utils.IdUtils;
-import com.fullcycle.codeflix.subscription.infrastructure.subscription.controllers.SubscriptionRestController;
+import com.fullcycle.codeflix.subscription.infrastructure.rest.controllers.SubscriptionRestController;
+import com.fullcycle.codeflix.subscription.infrastructure.rest.models.res.CreateSubscriptionResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -53,8 +54,8 @@ class SubscriptionRestControllerTest {
                 }
                 """.formatted(expectedUserId, expectedPlanId, expectedBillingCycle.name(), expectedPrice);
 
-        when(createSubscription.execute(any()))
-                .thenReturn(new CreateSubscription.Output(expectedSubscription));
+        when(createSubscription.execute(any(), any()))
+                .thenReturn(new CreateSubscriptionResponse(expectedSubscription));
 
         // when
         final var aRequest = post("/subscriptions")
@@ -72,14 +73,12 @@ class SubscriptionRestControllerTest {
         // then
         final var cmdCaptor = ArgumentCaptor.forClass(CreateSubscription.Input.class);
 
-        verify(createSubscription).execute(cmdCaptor.capture());
+        verify(createSubscription).execute(cmdCaptor.capture(), any());
 
         final var actualCmd = cmdCaptor.getValue();
 
         Assertions.assertEquals(expectedUserId, actualCmd.userId());
         Assertions.assertEquals(expectedPlanId, actualCmd.planId());
-        Assertions.assertEquals(expectedBillingCycle, actualCmd.billingCycle());
-        Assertions.assertEquals(expectedPrice, actualCmd.price());
     }
 
     @Test

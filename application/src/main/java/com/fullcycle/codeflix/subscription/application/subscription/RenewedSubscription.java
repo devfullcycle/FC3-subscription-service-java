@@ -11,6 +11,7 @@ public abstract class RenewedSubscription
         String userId();
         String subscriptionId();
         String transactionId();
+        String reason();
     }
 
     public interface Output {

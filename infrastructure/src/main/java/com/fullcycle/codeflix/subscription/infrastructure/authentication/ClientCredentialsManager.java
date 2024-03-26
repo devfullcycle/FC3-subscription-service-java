@@ -1,5 +1,6 @@
 package com.fullcycle.codeflix.subscription.infrastructure.authentication;
 
+import com.fullcycle.codeflix.subscription.infrastructure.authentication.AuthenticationGateway.Authentication;
 import com.fullcycle.codeflix.subscription.infrastructure.authentication.AuthenticationGateway.ClientCredentialsInput;
 import com.fullcycle.codeflix.subscription.infrastructure.authentication.AuthenticationGateway.RefreshTokenInput;
 import com.fullcycle.codeflix.subscription.infrastructure.configuration.properties.KeycloakProperties;
@@ -38,11 +39,11 @@ public class ClientCredentialsManager implements GetClientCredentials, RefreshCl
         UPDATER.set(this, new ClientCredentials(clientId(), result.accessToken(), result.refreshToken()));
     }
 
-    private AuthenticationGateway.AuthenticationResult login() {
+    private Authentication login() {
         return this.authenticationGateway.login(new ClientCredentialsInput(clientId(), clientSecret()));
     }
 
-    private AuthenticationGateway.AuthenticationResult refreshToken() {
+    private Authentication refreshToken() {
         try {
             return this.authenticationGateway.refresh(new RefreshTokenInput(clientId(), clientSecret(), this.credentials.refreshToken()));
         } catch (RuntimeException ex) {

@@ -3,7 +3,8 @@ package com.fullcycle.codeflix.subscription.infrastructure.authentication;
 import com.fullcycle.codeflix.subscription.AbstractRestClientTest;
 import com.fullcycle.codeflix.subscription.infrastructure.authentication.AuthenticationGateway.ClientCredentialsInput;
 import com.fullcycle.codeflix.subscription.infrastructure.authentication.AuthenticationGateway.RefreshTokenInput;
-import com.fullcycle.codeflix.subscription.infrastructure.authentication.KeycloakAuthenticationGateway.KeycloakAuthenticationResult;
+import com.fullcycle.codeflix.subscription.infrastructure.gateways.KeycloakAuthenticationClient;
+import com.fullcycle.codeflix.subscription.infrastructure.gateways.KeycloakAuthenticationClient.KeycloakAuthenticationResponse;
 import com.fullcycle.codeflix.subscription.infrastructure.configuration.json.Json;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +14,10 @@ import org.springframework.http.MediaType;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class KeycloakAuthenticationGatewayTest extends AbstractRestClientTest {
+class KeycloakAuthenticationClientTest extends AbstractRestClientTest {
 
     @Autowired
-    private KeycloakAuthenticationGateway gateway;
+    private KeycloakAuthenticationClient gateway;
 
     @Test
     public void givenValidParams_whenCallsLogin_shouldReturnClientCredentials() {
@@ -33,7 +34,7 @@ class KeycloakAuthenticationGatewayTest extends AbstractRestClientTest {
                         .willReturn(aResponse()
                                 .withStatus(200)
                                 .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                                .withBody(Json.writeValueAsString(new KeycloakAuthenticationResult(expectedAccessToken, expectedRefreshToken)))
+                                .withBody(Json.writeValueAsString(new KeycloakAuthenticationResponse(expectedAccessToken, expectedRefreshToken)))
                         )
         );
 
@@ -61,7 +62,7 @@ class KeycloakAuthenticationGatewayTest extends AbstractRestClientTest {
                         .willReturn(aResponse()
                                 .withStatus(200)
                                 .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                                .withBody(Json.writeValueAsString(new KeycloakAuthenticationResult(expectedAccessToken, expectedRefreshToken)))
+                                .withBody(Json.writeValueAsString(new KeycloakAuthenticationResponse(expectedAccessToken, expectedRefreshToken)))
                         )
         );
 

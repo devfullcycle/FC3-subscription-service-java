@@ -17,31 +17,23 @@
 - IDE de sua preferência
 - Docker
 
-## Keycloak
+## Fluxos
 
-### Admin REST API
+### Detalhes da criação de um usuário com vínculo no Keycloak
+```mermaid
+flowchart TD
+    A[Sign up] -->|input data| B(SignUp mediator)
+    B -->|input data| C(IAM SignUp - Keycloak)
+    B -->|input data with iam id| D(UserAccount SignUp)
+```
 
-#### Authentication
-
-Para usar a Admin REST API vamos precisar criar um *Client* que contenha permissões `manage-users`. 
-
-**Passo 1: Criando client para o microserviço**
-1. Ir até o realm **fc3-codeflix** (ou o nome que tenha escolhido).
-2. Ir até o `Clients` -> `Create client`.
-3. Preencher com as informações abaixo e clicar em `Next`:
-   - **Client ID**: `fc3-subscription-service`
-   - **Name**: `Subscription Service`
-4. Nesse passo de `Capability config`, preencher com as informações abaixo e clicar em `Save`:
-   - **Client authentication**: ON
-   - **Authentication flow**: Habilitar `Standard flow`, `Direct access grants` e `Service accounts roles`.
-
-**Passo 2: Configurando as permissões**
-1. Ir até o `Clients` -> `fc3-subscription-service`.
-2. Navegar até a aba `Service account roles` -> Botão `Assign role`.
-3. Modificar o filtro para `Filter by clients`.
-4. Selecionar `(realm-management) manage-users`.
-5. Navegar até a aba `Advanced` -> Habilitar `Use refresh tokens for client credentials grant` e salvar.
-
-Feito isso podemos utilizar esse user para gerenciar os novos usuários e suas roles.
-
-Login URL: http://keycloak.internal:8443/realms/fc3-codeflix/protocol/openid-connect/auth?response_type=code&client_id=fc3-subscription-service-cli&redirect_uri=http://localhost:8080/api/authorization-callback
+### Ciclo de vida de uma Subscription
+```mermaid
+flowchart TD
+    A[Create Subscription] --> B(Trial)
+    B -- Charge Subscription --> C{charge succeeded?}
+    C -->|YES| D[Active]
+    C -->|CANCEL| F[Canceled]
+    C -->|NO| E[Incomplete]
+    E --> |Retry charging| B
+```

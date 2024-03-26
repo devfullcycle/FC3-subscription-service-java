@@ -1,7 +1,7 @@
-package com.fullcycle.codeflix.subscription.infrastructure.subscription;
+package com.fullcycle.codeflix.subscription.infrastructure.rest;
 
-import com.fullcycle.codeflix.subscription.application.subscription.CreateSubscription;
-import com.fullcycle.codeflix.subscription.infrastructure.subscription.models.CreateSubscriptionInput;
+import com.fullcycle.codeflix.subscription.infrastructure.rest.models.req.CreateSubscriptionRequest;
+import com.fullcycle.codeflix.subscription.infrastructure.rest.models.res.CreateSubscriptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @RequestMapping(value = "subscriptions")
-@Tag(name = "subscription")
+@Tag(name = "Subscription")
 public interface SubscriptionRestAPI {
 
     @PostMapping(
@@ -27,6 +27,6 @@ public interface SubscriptionRestAPI {
             @ApiResponse(responseCode = "422", description = "A validation error was thrown"),
             @ApiResponse(responseCode = "500", description = "An internal server error was thrown"),
     })
-    ResponseEntity<CreateSubscription.Output> createSubscription(@RequestBody @Valid CreateSubscriptionInput cmd);
+    ResponseEntity<CreateSubscriptionResponse> createSubscription(@RequestBody @Valid CreateSubscriptionRequest cmd);
 
 }

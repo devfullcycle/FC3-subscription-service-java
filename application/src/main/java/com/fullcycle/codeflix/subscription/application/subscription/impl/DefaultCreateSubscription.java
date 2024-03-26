@@ -4,9 +4,10 @@ import com.fullcycle.codeflix.subscription.application.subscription.CreateSubscr
 import com.fullcycle.codeflix.subscription.domain.AggregateRoot;
 import com.fullcycle.codeflix.subscription.domain.Identifier;
 import com.fullcycle.codeflix.subscription.domain.exceptions.DomainException;
-import com.fullcycle.codeflix.subscription.domain.plan.Plan;
 import com.fullcycle.codeflix.subscription.domain.plan.PlanGateway;
 import com.fullcycle.codeflix.subscription.domain.plan.PlanId;
+import com.fullcycle.codeflix.subscription.domain.plan.PlanNotFoundException;
+import com.fullcycle.codeflix.subscription.domain.subscription.ActiveSubscriptionException;
 import com.fullcycle.codeflix.subscription.domain.subscription.Subscription;
 import com.fullcycle.codeflix.subscription.domain.subscription.SubscriptionGateway;
 import com.fullcycle.codeflix.subscription.domain.user.User;
@@ -37,20 +38,30 @@ public class DefaultCreateSubscription extends CreateSubscription {
         final var userId = new UserId(in.userId());
         final var planId = new PlanId(in.planId());
 
-        this.planGateway.planOfId(planId)
-                .orElseThrow(() -> notFound(Plan.class, planId));
+        validatePlanExistence(planId);
+        validateSubscriptionExistence(userId);
 
         final var user = userGateway.userOfId(userId)
                 .orElseThrow(() -> notFound(User.class, userId));
-
-        subscriptionGateway.subscriptionOfUser(userId).ifPresent(s -> {
-            throw DomainException.with("", "");
-        });
 
         final var subscription = newSubscriptionWith(user, planId);
         subscriptionGateway.save(subscription);
 
         return new StdOutput(subscription.id().value());
+    }
+
+    private void validatePlanExistence(final PlanId planId) {
+        if (!this.planGateway.existsPlanOfId(planId)) {
+            throw new PlanNotFoundException(planId);
+        }
+    }
+
+    private void validateSubscriptionExistence(final UserId userId) {
+        subscriptionGateway.latestSubscriptionOfUser(userId).ifPresent(s -> {
+            if (!s.isCanceled()) {
+                throw new ActiveSubscriptionException(userId, s.id());
+            }
+        });
     }
 
     private Subscription newSubscriptionWith(final User user, final PlanId planId) {
@@ -65,7 +76,7 @@ public class DefaultCreateSubscription extends CreateSubscription {
         return DomainException.with(new ValidationError("%s with id %s was not found".formatted(clazz.getCanonicalName(), id.value())));
     }
 
-    record StdOutput(String subscriptionId) implements Output {
+    public record StdOutput(String subscriptionId) implements Output {
 
     }
 }

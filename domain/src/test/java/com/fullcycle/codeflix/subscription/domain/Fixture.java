@@ -1,6 +1,8 @@
 package com.fullcycle.codeflix.subscription.domain;
 
 import com.fullcycle.codeflix.subscription.domain.plan.Plan;
+import com.fullcycle.codeflix.subscription.domain.plan.PlanId;
+import com.fullcycle.codeflix.subscription.domain.utils.IdUtils;
 import net.datafaker.Faker;
 
 public final class Fixture {
@@ -10,7 +12,10 @@ public final class Fixture {
     public static class Plans {
 
         public static Plan free() {
-            return Plan.newPlan("Free", FAKER.text().text(255), true);
+            return Plan.with(
+                    new PlanId(IdUtils.uniqueId()), "Free", FAKER.text().text(255),
+                    "free", true, "USD", 0.0
+            );
         }
     }
 }

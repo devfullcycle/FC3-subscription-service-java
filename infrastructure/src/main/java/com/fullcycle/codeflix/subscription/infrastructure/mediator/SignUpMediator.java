@@ -1,11 +1,9 @@
-package com.fullcycle.codeflix.subscription.infrastructure.users;
+package com.fullcycle.codeflix.subscription.infrastructure.mediator;
 
 import com.fullcycle.codeflix.subscription.application.iam.IamSignUp;
 import com.fullcycle.codeflix.subscription.application.user.SignUp;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
+import com.fullcycle.codeflix.subscription.infrastructure.rest.models.req.SignUpRequest;
+import com.fullcycle.codeflix.subscription.infrastructure.rest.models.res.SignUpResponse;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
@@ -21,21 +19,10 @@ public class SignUpMediator {
         this.userSignUp = Objects.requireNonNull(userSignUp);
     }
 
-    public String signUp(final SignUpInput in) {
+    public SignUpResponse signUp(final SignUpRequest in) {
         final var iamUser = this.iamSignUp.execute(new IamSignUpInput(in));
         this.userSignUp.execute(new UserSignUpInput(in, iamUser));
-        return iamUser.userId();
-    }
-
-    public record SignUpInput(
-            @NotEmpty @Max(255) String firstname,
-            @NotEmpty @Max(255) String lastname,
-            @NotEmpty @Email String email,
-            @NotEmpty @Min(12) @Max(20) String password,
-            @NotEmpty String documentNumber,
-            @NotEmpty String documentType
-    ) {
-
+        return new SignUpResponse(iamUser.userId());
     }
 
     public record IamSignUpInput(
@@ -44,7 +31,7 @@ public class SignUpMediator {
             String email,
             String password
     ) implements IamSignUp.Input {
-        public IamSignUpInput(SignUpInput in) {
+        public IamSignUpInput(SignUpRequest in) {
             this(in.firstname(), in.lastname(), in.email(), in.password());
         }
     }
@@ -56,11 +43,8 @@ public class SignUpMediator {
             String documentNumber,
             String documentType
     ) implements SignUp.Input {
-        public UserSignUpInput(SignUpInput in, IamSignUp.Output out) {
+        public UserSignUpInput(SignUpRequest in, IamSignUp.Output out) {
             this(in.firstname(), in.lastname(), out.userId(), in.documentNumber(), in.documentType());
         }
-    }
-
-    public record Output(String userId) {
     }
 }

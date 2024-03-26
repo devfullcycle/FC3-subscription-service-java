@@ -10,7 +10,7 @@ public abstract class CreatePlan extends UseCase<CreatePlan.Input, CreatePlan.Ou
         Double price();
         String currency();
         String groupId();
-        boolean active();
+        Boolean active();
     }
 
     public interface Output {

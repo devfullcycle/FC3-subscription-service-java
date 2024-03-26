@@ -5,7 +5,11 @@ public sealed interface SubscriptionStatus permits
         TrailingSubscriptionStatus,
         ActiveSubscriptionStatus,
         CanceledSubscriptionStatus {
-    //    PENDING_PAYMENT, PAID, ACTIVE, EXPIRED, SUSPENDED;
+
+    String TRAILING = "trailing";
+    String INCOMPLETE = "incomplete";
+    String ACTIVE = "active";
+    String CANCELED = "canceled";
 
     String value();
 
@@ -15,6 +19,6 @@ public sealed interface SubscriptionStatus permits
 
     void active();
 
-    void canceled();
+    void cancel();
 
 }

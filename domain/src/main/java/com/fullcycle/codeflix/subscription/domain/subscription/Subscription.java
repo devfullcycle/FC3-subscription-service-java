@@ -3,6 +3,7 @@ package com.fullcycle.codeflix.subscription.domain.subscription;
 import com.fullcycle.codeflix.subscription.domain.AggregateRoot;
 import com.fullcycle.codeflix.subscription.domain.plan.Plan;
 import com.fullcycle.codeflix.subscription.domain.plan.PlanId;
+import com.fullcycle.codeflix.subscription.domain.subscription.status.CanceledSubscriptionStatus;
 import com.fullcycle.codeflix.subscription.domain.subscription.status.SubscriptionStatus;
 import com.fullcycle.codeflix.subscription.domain.subscription.status.SubscriptionStatusFactory;
 import com.fullcycle.codeflix.subscription.domain.user.UserId;
@@ -16,7 +17,7 @@ import static com.fullcycle.codeflix.subscription.domain.utils.InstantUtils.now;
 public class Subscription extends AggregateRoot<SubscriptionId> {
 
     private static final int FIRST_VERSION = 0;
-    public static final int TRIAL_MONTHS = 1;
+    private static final int TRIAL_MONTHS = 1;
 
     private PlanId planId;
     private UserId userId;
@@ -65,8 +66,8 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
                 FIRST_VERSION,
                 now,
                 now,
-                "trailing",
-                null,
+                SubscriptionStatus.TRAILING,
+                LocalDate.now().plusMonths(TRIAL_MONTHS),
                 null,
                 null
         );
@@ -98,9 +99,10 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
         );
     }
 
-    public Subscription incomplete(final String reason) {
+    public Subscription incomplete(final String reason, final String lastTransactionId) {
         this.assertArgumentNotEmpty(reason, "'reason' should not be empty");
         this.status.incomplete();
+        this.setLastTransactionId(lastTransactionId);
         this.registerEvent(new SubscriptionIncomplete(this, reason));
         return this;
     }
@@ -116,8 +118,8 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
         return this;
     }
 
-    public Subscription canceled() {
-        this.status.canceled();
+    public Subscription cancel() {
+        this.status.cancel();
         this.setUpdatedAt(InstantUtils.now());
         this.registerEvent(new SubscriptionCanceled(this));
         return this;
@@ -157,6 +159,10 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
 
     public String lastTransactionId() {
         return lastTransactionId;
+    }
+
+    public boolean isCanceled() {
+        return this.status instanceof CanceledSubscriptionStatus;
     }
 
     public void setStatus(final SubscriptionStatus status) {
@@ -200,4 +206,5 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
     private void setLastTransactionId(String lastTransactionId) {
         this.lastTransactionId = lastTransactionId;
     }
+
 }

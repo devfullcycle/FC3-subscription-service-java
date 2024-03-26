@@ -1,6 +1,7 @@
-package com.fullcycle.codeflix.subscription.infrastructure.authentication;
+package com.fullcycle.codeflix.subscription.infrastructure.gateways;
 
 import com.fullcycle.codeflix.subscription.domain.exceptions.InternalErrorException;
+import com.fullcycle.codeflix.subscription.infrastructure.authentication.AuthenticationGateway;
 import com.fullcycle.codeflix.subscription.infrastructure.configuration.annotations.Keycloak;
 import com.fullcycle.codeflix.subscription.infrastructure.configuration.properties.KeycloakProperties;
 import org.springframework.http.MediaType;
@@ -11,21 +12,21 @@ import org.springframework.web.client.RestClient;
 import java.util.Objects;
 
 @Component
-public class KeycloakAuthenticationGateway implements AuthenticationGateway {
+public class KeycloakAuthenticationClient implements AuthenticationGateway {
 
     private final RestClient restClient;
     private final String tokenUri;
 
-    public KeycloakAuthenticationGateway(
-            @Keycloak final RestClient restClient,
+    public KeycloakAuthenticationClient(
+            @Keycloak final RestClient.Builder restClient,
             final KeycloakProperties keycloakProperties
     ) {
-        this.restClient = Objects.requireNonNull(restClient);
-        this.tokenUri = keycloakProperties.tokenUri();
+        this.restClient = Objects.requireNonNull(restClient).build();
+        this.tokenUri =  Objects.requireNonNull(keycloakProperties).tokenUri();
     }
 
     @Override
-    public AuthenticationResult login(final ClientCredentialsInput input) {
+    public Authentication login(final ClientCredentialsInput input) {
         final var map = new LinkedMultiValueMap<>();
         map.set("grant_type", "client_credentials");
         map.set("client_id", input.clientId());
@@ -37,17 +38,17 @@ public class KeycloakAuthenticationGateway implements AuthenticationGateway {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(map)
                 .retrieve()
-                .body(KeycloakAuthenticationResult.class);
+                .body(KeycloakAuthenticationResponse.class);
 
         if (output == null) {
             throw InternalErrorException.with("Failed to create client credentials [clientId:%s]".formatted(input.clientId()));
         }
 
-        return new AuthenticationResult(output.accessToken, output.refreshToken);
+        return new Authentication(output.accessToken, output.refreshToken);
     }
 
     @Override
-    public AuthenticationResult refresh(final RefreshTokenInput input) {
+    public Authentication refresh(final RefreshTokenInput input) {
         final var map = new LinkedMultiValueMap<>();
         map.set("grant_type", "refresh_token");
         map.set("client_id", input.clientId());
@@ -60,18 +61,15 @@ public class KeycloakAuthenticationGateway implements AuthenticationGateway {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(map)
                 .retrieve()
-                .body(KeycloakAuthenticationResult.class);
+                .body(KeycloakAuthenticationResponse.class);
 
         if (output == null) {
             throw InternalErrorException.with("Failed to refresh client credentials [clientId:%s]".formatted(input.clientId()));
         }
 
-        return new AuthenticationResult(output.accessToken, output.refreshToken);
+        return new Authentication(output.accessToken, output.refreshToken);
     }
 
-    public record KeycloakAuthenticationResult(
-            String accessToken,
-            String refreshToken
-    ) {
+    public record KeycloakAuthenticationResponse(String accessToken, String refreshToken) {
     }
 }

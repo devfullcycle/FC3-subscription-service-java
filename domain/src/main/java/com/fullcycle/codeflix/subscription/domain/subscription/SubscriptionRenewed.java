@@ -1,6 +1,7 @@
 package com.fullcycle.codeflix.subscription.domain.subscription;
 
 import com.fullcycle.codeflix.subscription.domain.DomainEvent;
+import com.fullcycle.codeflix.subscription.domain.monetary.MonetaryAmount;
 import com.fullcycle.codeflix.subscription.domain.plan.Plan;
 import com.fullcycle.codeflix.subscription.domain.plan.PlanId;
 import com.fullcycle.codeflix.subscription.domain.subscription.billing.BillingRecord;
@@ -19,7 +20,7 @@ public class SubscriptionRenewed extends DomainEvent {
     private final PlanId planId;
     private final String transactionId;
     private final LocalDate dueDate;
-    private final Double price;
+    private final MonetaryAmount price;
     private final Instant renewedAt;
 
     public SubscriptionRenewed(final Subscription subscription, final Plan plan, final String transactionId) {
@@ -43,7 +44,7 @@ public class SubscriptionRenewed extends DomainEvent {
             final PlanId planId,
             final String transactionId,
             final LocalDate dueDate,
-            final Double price,
+            final MonetaryAmount price,
             final Instant renewedAt
     ) {
         super(eventId, eventVersion, aggregateId, occurredOn);
@@ -68,9 +69,10 @@ public class SubscriptionRenewed extends DomainEvent {
         final var transactionId = (String) payload.get("transactionId");
         final var planId = (String) payload.get("planId");
         final var dueDate = (LocalDate) payload.get("dueDate");
-        final var price = (Double) payload.get("price");
+        final var price = (Double) payload.get("priceAmount");
+        final var currency = (String) payload.get("priceCurrency");
         final var renewedAt = (Instant) payload.get("renewedAt");
-        return new SubscriptionRenewed(eventId, eventVersion, aggregateId, occurredOn, new SubscriptionId(subscriptionId), new UserId(userId), new PlanId(planId), transactionId, dueDate, price, renewedAt);
+        return new SubscriptionRenewed(eventId, eventVersion, aggregateId, occurredOn, new SubscriptionId(subscriptionId), new UserId(userId), new PlanId(planId), transactionId, dueDate, new MonetaryAmount(price, currency), renewedAt);
     }
 
     @Override
@@ -86,7 +88,8 @@ public class SubscriptionRenewed extends DomainEvent {
                 "planId", planId.value(),
                 "transactionId", transactionId,
                 "dueDate", dueDate,
-                "price", price,
+                "priceAmount", price.amount(),
+                "priceCurrency", price.currency().getCurrencyCode(),
                 "renewedAt", renewedAt
         );
     }

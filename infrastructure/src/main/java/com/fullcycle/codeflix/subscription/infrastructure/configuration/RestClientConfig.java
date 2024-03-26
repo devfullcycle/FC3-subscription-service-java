@@ -1,8 +1,6 @@
 package com.fullcycle.codeflix.subscription.infrastructure.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fullcycle.codeflix.subscription.infrastructure.configuration.annotations.Categories;
-import com.fullcycle.codeflix.subscription.infrastructure.configuration.annotations.Genres;
 import com.fullcycle.codeflix.subscription.infrastructure.configuration.annotations.Keycloak;
 import com.fullcycle.codeflix.subscription.infrastructure.configuration.properties.RestClientProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -20,20 +18,6 @@ import java.util.List;
 public class RestClientConfig {
 
     @Bean
-    @ConfigurationProperties(prefix = "rest-client.categories")
-    @Categories
-    public RestClientProperties categoryRestClientProperties() {
-        return new RestClientProperties();
-    }
-
-    @Bean
-    @ConfigurationProperties(prefix = "rest-client.genres")
-    @Genres
-    public RestClientProperties genreRestClientProperties() {
-        return new RestClientProperties();
-    }
-
-    @Bean
     @ConfigurationProperties(prefix = "rest-client.keycloak")
     @Keycloak
     public RestClientProperties keycloakRestClientProperties() {
@@ -41,24 +25,12 @@ public class RestClientConfig {
     }
 
     @Bean
-    @Categories
-    public RestClient categoryHttpClient(@Categories final RestClientProperties properties, final ObjectMapper objectMapper) {
-        return restClient(properties, objectMapper);
-    }
-
-    @Bean
-    @Genres
-    public RestClient genreHttpClient(@Genres final RestClientProperties properties, final ObjectMapper objectMapper) {
-        return restClient(properties, objectMapper);
-    }
-
-    @Bean
     @Keycloak
-    public RestClient keycloakHttpClient(@Keycloak final RestClientProperties properties, final ObjectMapper objectMapper) {
+    public RestClient.Builder keycloakHttpClient(@Keycloak final RestClientProperties properties, final ObjectMapper objectMapper) {
         return restClient(properties, objectMapper);
     }
 
-    private static RestClient restClient(final RestClientProperties properties, final ObjectMapper objectMapper) {
+    private static RestClient.Builder restClient(final RestClientProperties properties, final ObjectMapper objectMapper) {
         final var factory = new JdkClientHttpRequestFactory();
         factory.setReadTimeout(properties.readTimeout());
 
@@ -69,8 +41,7 @@ public class RestClientConfig {
                     converters.removeIf(it -> it instanceof MappingJackson2HttpMessageConverter);
                     converters.add(jsonConverter(objectMapper));
                     converters.add(new FormHttpMessageConverter());
-                })
-                .build();
+                });
     }
 
     private static MappingJackson2HttpMessageConverter jsonConverter(ObjectMapper objectMapper) {

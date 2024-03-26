@@ -5,11 +5,9 @@ import com.fullcycle.codeflix.subscription.domain.subscription.Subscription;
 
 public record IncompleteSubscriptionStatus(Subscription subscription) implements SubscriptionStatus {
 
-    private static final String VALUE = "incomplete";
-
     @Override
     public String value() {
-        return VALUE;
+        return SubscriptionStatus.INCOMPLETE;
     }
 
     @Override
@@ -28,7 +26,7 @@ public record IncompleteSubscriptionStatus(Subscription subscription) implements
     }
 
     @Override
-    public void canceled() {
+    public void cancel() {
         this.subscription.setStatus(new CanceledSubscriptionStatus(subscription));
     }
 }

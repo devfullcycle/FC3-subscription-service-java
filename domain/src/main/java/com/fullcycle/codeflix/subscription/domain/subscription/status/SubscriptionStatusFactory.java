@@ -8,10 +8,10 @@ public final class SubscriptionStatusFactory {
 
     public static SubscriptionStatus create(final Subscription subscription, final String value) {
         return switch (value) {
-            case "trailing" -> new TrailingSubscriptionStatus(subscription);
-            case "incomplete" -> new IncompleteSubscriptionStatus(subscription);
-            case "active" -> new ActiveSubscriptionStatus(subscription);
-            case "canceled" -> new CanceledSubscriptionStatus(subscription);
+            case SubscriptionStatus.TRAILING -> new TrailingSubscriptionStatus(subscription);
+            case SubscriptionStatus.INCOMPLETE -> new IncompleteSubscriptionStatus(subscription);
+            case SubscriptionStatus.ACTIVE -> new ActiveSubscriptionStatus(subscription);
+            case SubscriptionStatus.CANCELED -> new CanceledSubscriptionStatus(subscription);
             default -> throw new IllegalArgumentException();
         };
     }

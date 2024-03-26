@@ -2,11 +2,11 @@ package com.fullcycle.codeflix.subscription.infrastructure.authentication;
 
 public interface AuthenticationGateway {
 
-    AuthenticationResult login(ClientCredentialsInput input);
+    Authentication login(ClientCredentialsInput input);
 
-    AuthenticationResult refresh(RefreshTokenInput input);
+    Authentication refresh(RefreshTokenInput input);
 
-    record AuthenticationResult(String accessToken, String refreshToken) {
+    record Authentication(String accessToken, String refreshToken) {
     }
 
     record ClientCredentialsInput(String clientId, String clientSecret) {

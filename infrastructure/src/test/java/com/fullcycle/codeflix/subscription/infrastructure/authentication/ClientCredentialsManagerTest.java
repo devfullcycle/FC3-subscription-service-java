@@ -1,7 +1,7 @@
 package com.fullcycle.codeflix.subscription.infrastructure.authentication;
 
 import com.fullcycle.codeflix.subscription.domain.exceptions.InternalErrorException;
-import com.fullcycle.codeflix.subscription.infrastructure.authentication.AuthenticationGateway.AuthenticationResult;
+import com.fullcycle.codeflix.subscription.infrastructure.authentication.AuthenticationGateway.Authentication;
 import com.fullcycle.codeflix.subscription.infrastructure.authentication.AuthenticationGateway.ClientCredentialsInput;
 import com.fullcycle.codeflix.subscription.infrastructure.authentication.AuthenticationGateway.RefreshTokenInput;
 import com.fullcycle.codeflix.subscription.infrastructure.authentication.ClientCredentialsManager.ClientCredentials;
@@ -40,7 +40,7 @@ class ClientCredentialsManagerTest {
         doReturn(expectedClientId).when(keycloakProperties).clientId();
         doReturn(expectedClientSecret).when(keycloakProperties).clientSecret();
 
-        doReturn(new AuthenticationResult(expectedAccessToken, expectedRefreshToken))
+        doReturn(new Authentication(expectedAccessToken, expectedRefreshToken))
                 .when(authenticationGateway).login(new ClientCredentialsInput(expectedClientId, expectedClientSecret));
 
         // when
@@ -64,7 +64,7 @@ class ClientCredentialsManagerTest {
         doReturn(expectedClientId).when(keycloakProperties).clientId();
         doReturn(expectedClientSecret).when(keycloakProperties).clientSecret();
 
-        doReturn(new AuthenticationResult(expectedAccessToken, expectedRefreshToken))
+        doReturn(new Authentication(expectedAccessToken, expectedRefreshToken))
                 .when(authenticationGateway).refresh(new RefreshTokenInput(expectedClientId, expectedClientSecret, "ref"));
 
         // when
@@ -93,7 +93,7 @@ class ClientCredentialsManagerTest {
         doThrow(InternalErrorException.with("BLA!"))
                 .when(authenticationGateway).refresh(new RefreshTokenInput(expectedClientId, expectedClientSecret, "ref"));
 
-        doReturn(new AuthenticationResult(expectedAccessToken, expectedRefreshToken))
+        doReturn(new Authentication(expectedAccessToken, expectedRefreshToken))
                 .when(authenticationGateway).login(new ClientCredentialsInput(expectedClientId, expectedClientSecret));
 
         // when

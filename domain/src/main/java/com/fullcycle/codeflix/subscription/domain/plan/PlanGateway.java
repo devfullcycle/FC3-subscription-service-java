@@ -11,6 +11,8 @@ public interface PlanGateway {
 
     Optional<Plan> planOfId(PlanId planId);
 
+    boolean existsPlanOfId(PlanId planId);
+
     Plan save(Plan subscription);
 
 }

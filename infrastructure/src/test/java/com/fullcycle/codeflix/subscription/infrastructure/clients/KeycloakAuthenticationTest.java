@@ -1,7 +1,7 @@
-package com.fullcycle.codeflix.subscription.infrastructure.authentication;
+package com.fullcycle.codeflix.subscription.infrastructure.clients;
 
 import com.fullcycle.codeflix.subscription.JacksonTest;
-import com.fullcycle.codeflix.subscription.infrastructure.authentication.KeycloakAuthenticationGateway.KeycloakAuthenticationResult;
+import com.fullcycle.codeflix.subscription.infrastructure.gateways.KeycloakAuthenticationClient.KeycloakAuthenticationResponse;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,10 +10,10 @@ import org.springframework.boot.test.json.JacksonTester;
 import java.io.IOException;
 
 @JacksonTest
-public class KeycloakAuthenticationResultTest {
+public class KeycloakAuthenticationTest {
 
     @Autowired
-    private JacksonTester<KeycloakAuthenticationResult> json;
+    private JacksonTester<KeycloakAuthenticationResponse> json;
 
     @Test
     public void testUnmarshall_shouldReadSnakeCaseResponse() throws IOException {
