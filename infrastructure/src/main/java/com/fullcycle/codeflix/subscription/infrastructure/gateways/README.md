@@ -1,15 +1,12 @@
-
 # Clean Architecture Gateways
 
 ## Tipos de implementações de Gateways
 
-1. `Adapters`: É um caso particular de implementação onde não conseguimos customizar o _driven actor_ de tal forma que
-    conseguimos fazer a inversão de dependência, nos obrigando a criar esse "middle man" para fazer a adaptação de 
-    um para outro e vice-versa. Para tangibilizar melhor a explicação, podemos pensar no Spring Data que nos obriga
-    a utilizar o *Repository pattern* para que ele implemente a camada de persistência. Não tem como fugir da interface
-    `XptoRepository`, logo, precisamos criar um `XptoRepositoryAdapter` para fazer a adaptação.
-2. `Client Https`: Nesse cenário não é necessário criar um adapter, podemos fazer a implementação do Gateway de domínio
-    ser o próprio componente *client* que conhece do _driven actor_.
-3. `In memory`: tbd
-4. `Filesystem`: tbd
-5. `Configurations` tbd
+1. `Clients`: São gateways HTTP que dão acesso a um sistema externo. Esses gateways possuem o sufixo `Client` quando
+   o mesmo foi criado exclusivamente para implementar o Gateway e recebe como parametro o Client HTTP baixo nível.
+   Nos casos onde utiliza-se um outra classe client para se conectar com um serviço externo e esse gateway é apenas
+   para converter a resposta desse client para a interface do gateway, leva-se o sufixo `ClientAdapter`.
+2. `Repositories`: São gateways que dão acesso a camada de persistência da aplicação, independente se é um RDBMS ou um
+   NoSQL. Esses gateways recebem o sufixo `Repository` quando o mesmo foi criado exclusivamente para implementar o
+   Gateway e recebe como parametro o JDBC client baixo nível. Nos casos onde utiliza-se uma outra classe, seja um
+   Repository do Spring Data ou um ActiveRecord do Panache por exemplo, leva-se o sufixo `RepositoryAdapter`.

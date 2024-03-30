@@ -7,7 +7,7 @@ import com.fullcycle.codeflix.subscription.domain.exceptions.DomainException;
 import com.fullcycle.codeflix.subscription.domain.subscription.Subscription;
 import com.fullcycle.codeflix.subscription.domain.subscription.SubscriptionGateway;
 import com.fullcycle.codeflix.subscription.domain.subscription.SubscriptionId;
-import com.fullcycle.codeflix.subscription.domain.user.UserId;
+import com.fullcycle.codeflix.subscription.domain.account.AccountId;
 import com.fullcycle.codeflix.subscription.domain.validation.ValidationError;
 
 import java.time.LocalDate;
@@ -27,7 +27,7 @@ public class DefaultIncompleteSubscription extends IncompleteSubscription {
 
         final var subscription =
                 subscriptionGateway.subscriptionOfId(subscriptionId)
-                        .filter(it -> it.userId().equals(new UserId(in.userId())))
+                        .filter(it -> it.accountId().equals(new AccountId(in.userId())))
                         .orElseThrow(() -> notFound(Subscription.class, subscriptionId));
 
         if (subscription.dueDate().isAfter(LocalDate.now())) {

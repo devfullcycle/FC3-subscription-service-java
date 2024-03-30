@@ -1,8 +1,8 @@
 package com.fullcycle.codeflix.subscription.infrastructure.configuration.usecases;
 
-import com.fullcycle.codeflix.subscription.application.user.SignUp;
-import com.fullcycle.codeflix.subscription.application.user.impl.DefaultSignUp;
-import com.fullcycle.codeflix.subscription.domain.user.UserGateway;
+import com.fullcycle.codeflix.subscription.application.account.CreateAccount;
+import com.fullcycle.codeflix.subscription.application.account.impl.DefaultCreateAccount;
+import com.fullcycle.codeflix.subscription.domain.account.AccountGateway;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 public class UserUseCases {
 
     @Bean
-    SignUp signUp(final UserGateway userGateway) {
-        return new DefaultSignUp(userGateway);
+    CreateAccount signUp(final AccountGateway accountGateway) {
+        return new DefaultCreateAccount(accountGateway);
     }
 }

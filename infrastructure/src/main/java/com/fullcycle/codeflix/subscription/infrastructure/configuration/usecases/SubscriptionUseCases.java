@@ -2,11 +2,11 @@ package com.fullcycle.codeflix.subscription.infrastructure.configuration.usecase
 
 import com.fullcycle.codeflix.subscription.application.subscription.*;
 import com.fullcycle.codeflix.subscription.application.subscription.impl.*;
-import com.fullcycle.codeflix.subscription.domain.iam.IdentityGateway;
+import com.fullcycle.codeflix.subscription.domain.account.iam.IdentityGateway;
 import com.fullcycle.codeflix.subscription.domain.payment.PaymentGateway;
 import com.fullcycle.codeflix.subscription.domain.plan.PlanGateway;
 import com.fullcycle.codeflix.subscription.domain.subscription.SubscriptionGateway;
-import com.fullcycle.codeflix.subscription.domain.user.UserGateway;
+import com.fullcycle.codeflix.subscription.domain.account.AccountGateway;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -23,18 +23,18 @@ public class SubscriptionUseCases {
             final PaymentGateway paymentGateway,
             final PlanGateway planGateway,
             final SubscriptionGateway subscriptionGateway,
-            final UserGateway userGateway
+            final AccountGateway accountGateway
     ) {
-        return new DefaultChargeSubscription(paymentGateway, planGateway, subscriptionGateway, userGateway);
+        return new DefaultChargeSubscription(paymentGateway, planGateway, subscriptionGateway, accountGateway);
     }
 
     @Bean
     CreateSubscription createSubscription(
             final PlanGateway planGateway,
             final SubscriptionGateway subscriptionGateway,
-            final UserGateway userGateway
+            final AccountGateway accountGateway
     ) {
-        return new DefaultCreateSubscription(planGateway, subscriptionGateway, userGateway);
+        return new DefaultCreateSubscription(planGateway, subscriptionGateway, accountGateway);
     }
 
     @Bean

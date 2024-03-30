@@ -26,6 +26,7 @@ public class DefaultCreatePlan extends CreatePlan {
         final var planId = this.planGateway.nextId();
         return Plan.with(
                 planId,
+                0,
                 in.name(),
                 in.description(),
                 in.groupId(),

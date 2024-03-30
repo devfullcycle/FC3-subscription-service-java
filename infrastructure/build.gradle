@@ -33,18 +33,23 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-webmvc-core:1.7.0")
     implementation("org.springdoc:springdoc-openapi-ui:1.7.0")
 
+    implementation('com.mysql:mysql-connector-j')
+
     implementation("org.springframework.boot:spring-boot-starter-web") {
         exclude module: 'spring-boot-starter-tomcat'
     }
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-cache")
-    implementation('org.springframework.boot:spring-boot-starter-data-jpa')
+    implementation('org.springframework.boot:spring-boot-starter-data-jdbc')
     implementation("org.springframework.boot:spring-boot-starter-undertow")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
     testImplementation(project(path: ':domain', configuration: 'testClasses'))
+
+    testImplementation('org.flywaydb:flyway-core')
+    testImplementation('org.flywaydb:flyway-mysql')
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
@@ -54,7 +59,10 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
 
     testImplementation("org.testcontainers:testcontainers:1.18.3")
+    testImplementation('org.testcontainers:mysql:1.17.6')
     testImplementation("org.testcontainers:junit-jupiter:1.18.3")
+
+    testRuntimeOnly('com.h2database:h2')
 }
 
 dependencyManagement {

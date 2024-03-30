@@ -13,7 +13,7 @@ public final class Fixture {
 
         public static Plan free() {
             return Plan.with(
-                    new PlanId(IdUtils.uniqueId()), "Free", FAKER.text().text(255),
+                    new PlanId(IdUtils.uniqueId()), 0, "Free", FAKER.text().text(255),
                     "free", true, "USD", 0.0
             );
         }

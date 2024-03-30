@@ -6,7 +6,7 @@ import com.fullcycle.codeflix.subscription.domain.plan.PlanId;
 import com.fullcycle.codeflix.subscription.domain.subscription.status.CanceledSubscriptionStatus;
 import com.fullcycle.codeflix.subscription.domain.subscription.status.SubscriptionStatus;
 import com.fullcycle.codeflix.subscription.domain.subscription.status.SubscriptionStatusFactory;
-import com.fullcycle.codeflix.subscription.domain.user.UserId;
+import com.fullcycle.codeflix.subscription.domain.account.AccountId;
 import com.fullcycle.codeflix.subscription.domain.utils.InstantUtils;
 
 import java.time.Instant;
@@ -19,9 +19,9 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
     private static final int FIRST_VERSION = 0;
     private static final int TRIAL_MONTHS = 1;
 
-    private PlanId planId;
-    private UserId userId;
     private int version;
+    private AccountId accountId;
+    private PlanId planId;
     private Instant createdAt;
     private Instant updatedAt;
     private LocalDate dueDate;
@@ -31,7 +31,7 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
 
     private Subscription(
             final SubscriptionId subscriptionId,
-            final UserId userId,
+            final AccountId accountId,
             final PlanId planId,
             final int version,
             final Instant createdAt,
@@ -42,7 +42,7 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
             final String lastTransactionId
     ) {
         super(subscriptionId);
-        setUserId(userId);
+        setAccountId(accountId);
         setPlanId(planId);
         setVersion(version);
         setCreatedAt(createdAt);
@@ -55,13 +55,13 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
 
     public static Subscription newSubscription(
             final SubscriptionId subscriptionId,
-            final UserId userId,
+            final AccountId accountId,
             final PlanId planId
     ) {
         final var now = now();
         return new Subscription(
                 subscriptionId,
-                userId,
+                accountId,
                 planId,
                 FIRST_VERSION,
                 now,
@@ -75,7 +75,7 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
 
     public static Subscription with(
             final SubscriptionId subscriptionId,
-            final UserId userId,
+            final AccountId accountId,
             final PlanId planId,
             final int version,
             final Instant createdAt,
@@ -87,7 +87,7 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
     ) {
         return new Subscription(
                 subscriptionId,
-                userId,
+                accountId,
                 planId,
                 version,
                 createdAt,
@@ -125,8 +125,8 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
         return this;
     }
 
-    public UserId userId() {
-        return userId;
+    public AccountId accountId() {
+        return accountId;
     }
 
     public int version() {
@@ -180,9 +180,9 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
         this.updatedAt = updatedAt;
     }
 
-    private void setUserId(final UserId userId) {
-        this.assertArgumentNotNull(userId, "'userId' is required");
-        this.userId = userId;
+    private void setAccountId(final AccountId accountId) {
+        this.assertArgumentNotNull(accountId, "'accountId' is required");
+        this.accountId = accountId;
     }
 
     private void setVersion(int version) {

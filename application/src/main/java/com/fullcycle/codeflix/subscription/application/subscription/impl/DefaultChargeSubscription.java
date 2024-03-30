@@ -14,9 +14,9 @@ import com.fullcycle.codeflix.subscription.domain.subscription.Subscription;
 import com.fullcycle.codeflix.subscription.domain.subscription.SubscriptionGateway;
 import com.fullcycle.codeflix.subscription.domain.subscription.SubscriptionId;
 import com.fullcycle.codeflix.subscription.domain.subscription.status.SubscriptionStatus;
-import com.fullcycle.codeflix.subscription.domain.user.User;
-import com.fullcycle.codeflix.subscription.domain.user.UserGateway;
-import com.fullcycle.codeflix.subscription.domain.user.UserId;
+import com.fullcycle.codeflix.subscription.domain.account.Account;
+import com.fullcycle.codeflix.subscription.domain.account.AccountGateway;
+import com.fullcycle.codeflix.subscription.domain.account.AccountId;
 import com.fullcycle.codeflix.subscription.domain.utils.IdUtils;
 import com.fullcycle.codeflix.subscription.domain.validation.ValidationError;
 
@@ -27,34 +27,34 @@ public class DefaultChargeSubscription extends ChargeSubscription {
     private final PaymentGateway paymentGateway;
     private final PlanGateway planGateway;
     private final SubscriptionGateway subscriptionGateway;
-    private final UserGateway userGateway;
+    private final AccountGateway accountGateway;
 
     public DefaultChargeSubscription(
             final PaymentGateway paymentGateway, PlanGateway planGateway,
             final SubscriptionGateway subscriptionGateway,
-            final UserGateway userGateway
+            final AccountGateway accountGateway
     ) {
         this.paymentGateway = Objects.requireNonNull(paymentGateway);
         this.planGateway = Objects.requireNonNull(planGateway);
         this.subscriptionGateway = Objects.requireNonNull(subscriptionGateway);
-        this.userGateway = Objects.requireNonNull(userGateway);
+        this.accountGateway = Objects.requireNonNull(accountGateway);
     }
 
     @Override
     public Output execute(final Input in) {
-        final var userId = new UserId(in.userId());
+        final var userId = new AccountId(in.userId());
         final var subscriptionId = new SubscriptionId(in.subscriptionId());
 
         final var subscription =
                 subscriptionGateway.subscriptionOfId(subscriptionId)
-                        .filter(it -> it.userId().equals(userId))
+                        .filter(it -> it.accountId().equals(userId))
                         .orElseThrow(() -> notFound(Subscription.class, subscriptionId));
 
         final var aPlan = this.planGateway.planOfId(subscription.planId())
                 .orElseThrow(() -> notFound(Plan.class, subscription.planId()));
 
-        final var user = this.userGateway.userOfId(userId)
-                .orElseThrow(() -> notFound(User.class, userId));
+        final var user = this.accountGateway.accountOfId(userId)
+                .orElseThrow(() -> notFound(Account.class, userId));
 
         final var aPayment = this.newPaymentWith(in.paymentType(), aPlan.price().amount(), user.billingAddress());
         final var aTransaction = this.paymentGateway.processPayment(aPayment);

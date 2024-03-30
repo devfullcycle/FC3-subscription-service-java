@@ -4,15 +4,15 @@ import com.fullcycle.codeflix.subscription.application.subscription.RenewedSubsc
 import com.fullcycle.codeflix.subscription.domain.AggregateRoot;
 import com.fullcycle.codeflix.subscription.domain.Identifier;
 import com.fullcycle.codeflix.subscription.domain.exceptions.DomainException;
-import com.fullcycle.codeflix.subscription.domain.iam.GroupId;
-import com.fullcycle.codeflix.subscription.domain.iam.IAMUserId;
-import com.fullcycle.codeflix.subscription.domain.iam.IdentityGateway;
+import com.fullcycle.codeflix.subscription.domain.account.iam.GroupId;
+import com.fullcycle.codeflix.subscription.domain.account.iam.IAMUserId;
+import com.fullcycle.codeflix.subscription.domain.account.iam.IdentityGateway;
 import com.fullcycle.codeflix.subscription.domain.plan.Plan;
 import com.fullcycle.codeflix.subscription.domain.plan.PlanGateway;
 import com.fullcycle.codeflix.subscription.domain.subscription.Subscription;
 import com.fullcycle.codeflix.subscription.domain.subscription.SubscriptionGateway;
 import com.fullcycle.codeflix.subscription.domain.subscription.SubscriptionId;
-import com.fullcycle.codeflix.subscription.domain.user.UserId;
+import com.fullcycle.codeflix.subscription.domain.account.AccountId;
 import com.fullcycle.codeflix.subscription.domain.validation.ValidationError;
 
 import java.util.Objects;
@@ -39,7 +39,7 @@ public class DefaultRenewedSubscription extends RenewedSubscription {
 
         final var subscription =
                 subscriptionGateway.subscriptionOfId(subscriptionId)
-                        .filter(it -> it.userId().equals(new UserId(in.userId())))
+                        .filter(it -> it.accountId().equals(new AccountId(in.userId())))
                         .orElseThrow(() -> notFound(Subscription.class, subscriptionId));
 
         final var aPlan = this.planGateway.planOfId(subscription.planId())

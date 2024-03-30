@@ -11,7 +11,18 @@ keycloak:
 rest-client:
   base-url: "http://localhost:${wiremock.server.port:8001}"
   keycloak:
-    read-timeout: 300
+    read-timeout: 1000
+
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    username: root
+    password: 123456
+    url: jdbc:h2:mem:adm_videos_test;MODE=MYSQL;DATABASE_TO_LOWER=TRUE # É possível persistir em um arquivo alterando "mem:adm_videos_test" para "file:./.h2/dev"
+  h2:
+    console:
+      enabled: true
+      path: /h2
 
 resilience4j.bulkhead:
   configs:

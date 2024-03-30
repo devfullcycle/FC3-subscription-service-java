@@ -1,6 +1,6 @@
 package com.fullcycle.codeflix.subscription.infrastructure.rest.controllers;
 
-import com.fullcycle.codeflix.subscription.infrastructure.mediator.SignUpMediator;
+import com.fullcycle.codeflix.subscription.application.account.CreateAccount;
 import com.fullcycle.codeflix.subscription.infrastructure.rest.UserRestAPI;
 import com.fullcycle.codeflix.subscription.infrastructure.rest.models.req.SignUpRequest;
 import com.fullcycle.codeflix.subscription.infrastructure.rest.models.res.SignUpResponse;
@@ -13,15 +13,15 @@ import java.util.Objects;
 @RestController
 public class UserRestController implements UserRestAPI {
 
-    private final SignUpMediator signUpMediator;
+    private final CreateAccount createAccount;
 
-    public UserRestController(final SignUpMediator signUpMediator) {
-        this.signUpMediator = Objects.requireNonNull(signUpMediator);
+    public UserRestController(final CreateAccount createAccount) {
+        this.createAccount = Objects.requireNonNull(createAccount);
     }
 
     @Override
-    public ResponseEntity<SignUpResponse> signUp(SignUpRequest req) {
-        final var output = this.signUpMediator.signUp(req);
+    public ResponseEntity<SignUpResponse> signUp(final SignUpRequest req) {
+        final var output = this.createAccount.execute(req, SignUpResponse::new);
         return ResponseEntity.created(URI.create("/users/%s".formatted(output.userId()))).body(output);
     }
 }

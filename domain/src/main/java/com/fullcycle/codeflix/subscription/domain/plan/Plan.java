@@ -5,6 +5,7 @@ import com.fullcycle.codeflix.subscription.domain.monetary.MonetaryAmount;
 
 public class Plan extends AggregateRoot<PlanId> {
 
+    private int version;
     private String name;
     private String description;
     private String groupId;
@@ -13,23 +14,26 @@ public class Plan extends AggregateRoot<PlanId> {
 
     private Plan(
             final PlanId planId,
-            final String name,
-            final String description,
-            final String groupId,
+            final int version,
+            final String aName,
+            final String aDescription,
+            final String aGroupId,
             final Boolean active,
             final String currency,
             final Double price
     ) {
         super(planId);
-        setName(name);
-        setDescription(description);
-        setGroupId(groupId);
+        setVersion(version);
+        setName(aName);
+        setDescription(aDescription);
+        setGroupId(aGroupId);
         setActive(active);
         setPrice(new MonetaryAmount(price, currency));
     }
 
     public static Plan with(
             final PlanId planId,
+            final int version,
             final String name,
             final String description,
             final String groupId,
@@ -37,7 +41,11 @@ public class Plan extends AggregateRoot<PlanId> {
             final String currency,
             final Double price
     ) {
-        return new Plan(planId, name, description, groupId, active, currency, price);
+        return new Plan(planId, version, name, description, groupId, active, currency, price);
+    }
+
+    public int version() {
+        return version;
     }
 
     public String name() {
@@ -58,6 +66,10 @@ public class Plan extends AggregateRoot<PlanId> {
 
     public String groupId() {
         return groupId;
+    }
+
+    private void setVersion(final int version) {
+        this.version = version;
     }
 
     private void setName(final String name) {

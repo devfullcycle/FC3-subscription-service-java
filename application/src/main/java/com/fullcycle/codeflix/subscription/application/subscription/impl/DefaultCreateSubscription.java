@@ -10,9 +10,9 @@ import com.fullcycle.codeflix.subscription.domain.plan.PlanNotFoundException;
 import com.fullcycle.codeflix.subscription.domain.subscription.ActiveSubscriptionException;
 import com.fullcycle.codeflix.subscription.domain.subscription.Subscription;
 import com.fullcycle.codeflix.subscription.domain.subscription.SubscriptionGateway;
-import com.fullcycle.codeflix.subscription.domain.user.User;
-import com.fullcycle.codeflix.subscription.domain.user.UserGateway;
-import com.fullcycle.codeflix.subscription.domain.user.UserId;
+import com.fullcycle.codeflix.subscription.domain.account.Account;
+import com.fullcycle.codeflix.subscription.domain.account.AccountGateway;
+import com.fullcycle.codeflix.subscription.domain.account.AccountId;
 import com.fullcycle.codeflix.subscription.domain.validation.ValidationError;
 
 import java.util.Objects;
@@ -21,28 +21,28 @@ public class DefaultCreateSubscription extends CreateSubscription {
 
     private final PlanGateway planGateway;
     private final SubscriptionGateway subscriptionGateway;
-    private final UserGateway userGateway;
+    private final AccountGateway accountGateway;
 
     public DefaultCreateSubscription(
             final PlanGateway planGateway,
             final SubscriptionGateway subscriptionGateway,
-            final UserGateway userGateway
+            final AccountGateway accountGateway
     ) {
         this.planGateway = Objects.requireNonNull(planGateway);
         this.subscriptionGateway = Objects.requireNonNull(subscriptionGateway);
-        this.userGateway = Objects.requireNonNull(userGateway);
+        this.accountGateway = Objects.requireNonNull(accountGateway);
     }
 
     @Override
     public Output execute(final Input in) {
-        final var userId = new UserId(in.userId());
+        final var userId = new AccountId(in.userId());
         final var planId = new PlanId(in.planId());
 
         validatePlanExistence(planId);
         validateSubscriptionExistence(userId);
 
-        final var user = userGateway.userOfId(userId)
-                .orElseThrow(() -> notFound(User.class, userId));
+        final var user = accountGateway.accountOfId(userId)
+                .orElseThrow(() -> notFound(Account.class, userId));
 
         final var subscription = newSubscriptionWith(user, planId);
         subscriptionGateway.save(subscription);
@@ -56,15 +56,15 @@ public class DefaultCreateSubscription extends CreateSubscription {
         }
     }
 
-    private void validateSubscriptionExistence(final UserId userId) {
-        subscriptionGateway.latestSubscriptionOfUser(userId).ifPresent(s -> {
+    private void validateSubscriptionExistence(final AccountId accountId) {
+        subscriptionGateway.latestSubscriptionOfUser(accountId).ifPresent(s -> {
             if (!s.isCanceled()) {
-                throw new ActiveSubscriptionException(userId, s.id());
+                throw new ActiveSubscriptionException(accountId, s.id());
             }
         });
     }
 
-    private Subscription newSubscriptionWith(final User user, final PlanId planId) {
+    private Subscription newSubscriptionWith(final Account user, final PlanId planId) {
         return Subscription.newSubscription(
                 this.subscriptionGateway.nextId(),
                 user.id(),
