@@ -6,12 +6,12 @@ import com.fullcycle.codeflix.subscription.infrastructure.observer.Publisher;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EventProcessingMediator {
+public class EventMediator {
 
     private final EventRepository eventRepository;
     private final Publisher<DomainEvent> domainEventPublisher;
 
-    public EventProcessingMediator(
+    public EventMediator(
             final EventRepository eventRepository,
             final Publisher<DomainEvent> domainEventPublisher
     ) {

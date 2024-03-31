@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fullcycle.codeflix.subscription.infrastructure.configuration.json.Json;
 import com.fullcycle.codeflix.subscription.infrastructure.kafka.models.connect.MessageValue;
 import com.fullcycle.codeflix.subscription.infrastructure.kafka.models.event.EventMessage;
-import com.fullcycle.codeflix.subscription.infrastructure.mediator.EventProcessingMediator;
+import com.fullcycle.codeflix.subscription.infrastructure.mediator.EventMediator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -22,10 +22,10 @@ public class EventListener {
     public static final TypeReference<MessageValue<EventMessage>> EVENT_MESSAGE = new TypeReference<>() {
     };
 
-    private final EventProcessingMediator eventProcessingMediator;
+    private final EventMediator eventMediator;
 
-    public EventListener(final EventProcessingMediator eventProcessingMediator) {
-        this.eventProcessingMediator = Objects.requireNonNull(eventProcessingMediator);
+    public EventListener(final EventMediator eventMediator) {
+        this.eventMediator = Objects.requireNonNull(eventMediator);
     }
 
     @KafkaListener(
@@ -55,7 +55,7 @@ public class EventListener {
             return;
         }
 
-        this.eventProcessingMediator.execute(messagePayload.after().id());
+        this.eventMediator.execute(messagePayload.after().id());
         ack.acknowledge();
     }
 }
