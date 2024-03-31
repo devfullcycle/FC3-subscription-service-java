@@ -1,14 +1,14 @@
 package com.fullcycle.codeflix.subscription.domain.subscription;
 
-import com.fullcycle.codeflix.subscription.domain.account.AccountId;
 import com.fullcycle.codeflix.subscription.domain.utils.InstantUtils;
 
 import java.time.Instant;
 import java.time.LocalDate;
 
 public record SubscriptionCanceled(
-        SubscriptionId subscriptionId,
-        AccountId accountId,
+        String subscriptionId,
+        String accountId,
+        String planId,
         LocalDate dueDate,
         Instant occurredOn
 ) implements SubscriptionEvent {
@@ -21,6 +21,12 @@ public record SubscriptionCanceled(
     }
 
     public SubscriptionCanceled(final Subscription subscription) {
-        this(subscription.id(), subscription.accountId(), subscription.dueDate(), InstantUtils.now());
+        this(
+                subscription.id().value(),
+                subscription.accountId().value(),
+                subscription.planId().value(),
+                subscription.dueDate(),
+                InstantUtils.now()
+        );
     }
 }

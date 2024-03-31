@@ -1,7 +1,7 @@
 package com.fullcycle.codeflix.subscription.application.account.impl;
 
 import com.fullcycle.codeflix.subscription.application.account.CreateIamUser;
-import com.fullcycle.codeflix.subscription.domain.account.iam.IAMUser;
+import com.fullcycle.codeflix.subscription.domain.account.iam.User;
 import com.fullcycle.codeflix.subscription.domain.account.iam.IdentityGateway;
 
 import java.util.Objects;
@@ -17,11 +17,11 @@ public class DefaultCreateIamUser extends CreateIamUser {
     @Override
     public Output execute(final Input in) {
         final var aUser = this.identityGateway.create(this.newUserWith(in));
-        return new StdOutput(aUser.id());
+        return new StdOutput(aUser.value());
     }
 
-    private IAMUser newUserWith(final Input in) {
-        return IAMUser.newUser(in.firstname(), in.lastname(), in.email(), in.password());
+    private User newUserWith(final Input in) {
+        return User.newUser(in.firstname(), in.lastname(), in.email(), in.password());
     }
 
     record StdOutput(String iamUserId) implements Output {

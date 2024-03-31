@@ -1,0 +1,2 @@
+insert into accounts (id, version, iam_user_id, email, firstname, lastname, address_zip_code, address_number, address_complement, address_country, document_number, document_type)
+values ('456', 10, '9999', 'john@gmail.com','John', 'Doe', '91230000', '999', '1', 'US', '12312312399', 'cpf');

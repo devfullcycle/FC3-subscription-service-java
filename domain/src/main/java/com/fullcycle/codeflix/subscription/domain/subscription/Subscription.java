@@ -1,12 +1,10 @@
 package com.fullcycle.codeflix.subscription.domain.subscription;
 
 import com.fullcycle.codeflix.subscription.domain.AggregateRoot;
+import com.fullcycle.codeflix.subscription.domain.account.AccountId;
 import com.fullcycle.codeflix.subscription.domain.plan.Plan;
 import com.fullcycle.codeflix.subscription.domain.plan.PlanId;
-import com.fullcycle.codeflix.subscription.domain.subscription.status.CanceledSubscriptionStatus;
-import com.fullcycle.codeflix.subscription.domain.subscription.status.SubscriptionStatus;
-import com.fullcycle.codeflix.subscription.domain.subscription.status.SubscriptionStatusFactory;
-import com.fullcycle.codeflix.subscription.domain.account.AccountId;
+import com.fullcycle.codeflix.subscription.domain.subscription.status.*;
 import com.fullcycle.codeflix.subscription.domain.utils.InstantUtils;
 
 import java.time.Instant;
@@ -56,13 +54,13 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
     public static Subscription newSubscription(
             final SubscriptionId subscriptionId,
             final AccountId accountId,
-            final PlanId planId
+            final Plan plan
     ) {
         final var now = now();
-        return new Subscription(
+        final var subscription = new Subscription(
                 subscriptionId,
                 accountId,
-                planId,
+                plan.id(),
                 FIRST_VERSION,
                 now,
                 now,
@@ -71,13 +69,15 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
                 null,
                 null
         );
+        subscription.registerEvent(new SubscriptionCreated(subscription, plan));
+        return subscription;
     }
 
     public static Subscription with(
             final SubscriptionId subscriptionId,
+            final int version,
             final AccountId accountId,
             final PlanId planId,
-            final int version,
             final Instant createdAt,
             final Instant updatedAt,
             final String status,
@@ -163,6 +163,18 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
 
     public boolean isCanceled() {
         return this.status instanceof CanceledSubscriptionStatus;
+    }
+
+    public boolean isTrail() {
+        return status instanceof TrailingSubscriptionStatus;
+    }
+
+    public boolean isActive() {
+        return status instanceof ActiveSubscriptionStatus;
+    }
+
+    public boolean isIncomplete() {
+        return status instanceof IncompleteSubscriptionStatus;
     }
 
     public void setStatus(final SubscriptionStatus status) {

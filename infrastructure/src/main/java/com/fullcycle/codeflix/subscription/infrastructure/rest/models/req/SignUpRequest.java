@@ -1,6 +1,5 @@
 package com.fullcycle.codeflix.subscription.infrastructure.rest.models.req;
 
-import com.fullcycle.codeflix.subscription.application.account.CreateAccount;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -14,6 +13,6 @@ public record SignUpRequest(
         @NotEmpty @Min(12) @Max(20) String password,
         @NotEmpty String documentNumber,
         @NotEmpty String documentType
-) implements CreateAccount.Input {
+) {
 
 }

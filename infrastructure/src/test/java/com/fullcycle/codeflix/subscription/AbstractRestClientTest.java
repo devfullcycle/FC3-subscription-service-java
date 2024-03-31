@@ -2,6 +2,7 @@ package com.fullcycle.codeflix.subscription;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fullcycle.codeflix.subscription.infrastructure.authentication.GetClientCredentials;
 import com.fullcycle.codeflix.subscription.infrastructure.configuration.RestClientConfig;
 import com.fullcycle.codeflix.subscription.infrastructure.configuration.properties.KeycloakProperties;
 import com.github.tomakehurst.wiremock.client.WireMock;
@@ -18,6 +19,7 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
@@ -58,6 +60,9 @@ public abstract class AbstractRestClientTest {
 
     @Autowired(required = false)
     private CacheManager cacheManager;
+
+    @MockBean
+    protected GetClientCredentials getClientCredentials;
 
     @BeforeEach
     void beforeEach() {

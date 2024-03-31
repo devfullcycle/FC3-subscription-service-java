@@ -6,6 +6,7 @@ import com.fullcycle.codeflix.subscription.domain.account.Account;
 public abstract class CreateAccount extends UseCase<CreateAccount.Input, CreateAccount.Output> {
 
     public interface Input {
+        String userId();
         String email();
         String firstname();
         String lastname();

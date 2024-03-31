@@ -1,8 +1,9 @@
 package com.fullcycle.codeflix.subscription.infrastructure.authentication;
 
-import com.fullcycle.codeflix.subscription.infrastructure.authentication.AuthenticationGateway.Authentication;
-import com.fullcycle.codeflix.subscription.infrastructure.authentication.AuthenticationGateway.ClientCredentialsInput;
-import com.fullcycle.codeflix.subscription.infrastructure.authentication.AuthenticationGateway.RefreshTokenInput;
+import com.fullcycle.codeflix.subscription.infrastructure.gateways.AuthenticationGateway;
+import com.fullcycle.codeflix.subscription.infrastructure.gateways.AuthenticationGateway.Authentication;
+import com.fullcycle.codeflix.subscription.infrastructure.gateways.AuthenticationGateway.ClientCredentialsInput;
+import com.fullcycle.codeflix.subscription.infrastructure.gateways.AuthenticationGateway.RefreshTokenInput;
 import com.fullcycle.codeflix.subscription.infrastructure.configuration.properties.KeycloakProperties;
 import org.springframework.stereotype.Component;
 

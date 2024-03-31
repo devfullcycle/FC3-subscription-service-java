@@ -10,6 +10,8 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
+import java.time.Clock;
+
 @Configuration(proxyBeanMethods = false)
 @ComponentScan("com.fullcycle.codeflix")
 @EnableScheduling
@@ -21,6 +23,11 @@ public class WebServerConfig {
         return ev -> {
             refreshClientCredentials.refresh();
         };
+    }
+
+    @Bean
+    public Clock clock() {
+        return Clock.systemUTC();
     }
 
     @Bean

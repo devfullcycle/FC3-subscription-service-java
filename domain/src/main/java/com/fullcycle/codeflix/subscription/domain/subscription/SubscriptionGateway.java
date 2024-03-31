@@ -12,6 +12,6 @@ public interface SubscriptionGateway {
 
     Optional<Subscription> latestSubscriptionOfUser(AccountId accountId);
 
-    Subscription save(Subscription subscription);
+    void save(Subscription subscription);
 
 }

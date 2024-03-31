@@ -1,6 +1,7 @@
 package com.fullcycle.codeflix.subscription.application.account.impl;
 
 import com.fullcycle.codeflix.subscription.application.account.CreateAccount;
+import com.fullcycle.codeflix.subscription.domain.account.iam.UserId;
 import com.fullcycle.codeflix.subscription.domain.person.Document;
 import com.fullcycle.codeflix.subscription.domain.person.Email;
 import com.fullcycle.codeflix.subscription.domain.person.Name;
@@ -27,6 +28,7 @@ public class DefaultCreateAccount extends CreateAccount {
     private Account newUserWith(final Input in) {
         return Account.newAccount(
                 this.accountGateway.nextId(),
+                new UserId(in.userId()),
                 new Email(in.email()),
                 new Name(in.firstname(), in.lastname()),
                 Document.create(in.documentNumber(), in.documentType())

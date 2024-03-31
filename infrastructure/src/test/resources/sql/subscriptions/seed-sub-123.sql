@@ -1,0 +1,2 @@
+insert into subscriptions (id, version, account_id, plan_id, status, created_at, updated_at, due_date, last_renew_dt, last_transaction_id)
+values ('123', 1, '12io31j', 'lk1l23kl1','active', '2024-03-30 17:42:01.433', '2024-03-30 17:42:01.444','2024-04-30', '2024-03-30 17:42:01.111', 'inv123123');

@@ -1,33 +1,34 @@
 package com.fullcycle.codeflix.subscription.domain.subscription;
 
-import com.fullcycle.codeflix.subscription.domain.account.AccountId;
-import com.fullcycle.codeflix.subscription.domain.monetary.MonetaryAmount;
 import com.fullcycle.codeflix.subscription.domain.plan.Plan;
-import com.fullcycle.codeflix.subscription.domain.plan.PlanId;
 import com.fullcycle.codeflix.subscription.domain.utils.InstantUtils;
 
 import java.time.Instant;
 import java.time.LocalDate;
 
 public record SubscriptionRenewed(
-        SubscriptionId subscriptionId,
-        AccountId accountId,
-        PlanId planId,
+        String subscriptionId,
+        String accountId,
+        String planId,
+        String groupId,
         String transactionId,
         LocalDate dueDate,
-        MonetaryAmount price,
+        String currency,
+        Double price,
         Instant renewedAt,
         Instant occurredOn
 ) implements SubscriptionEvent {
 
     public SubscriptionRenewed(final Subscription subscription, final Plan plan, final String transactionId) {
         this(
-                subscription.id(),
-                subscription.accountId(),
-                plan.id(),
+                subscription.id().value(),
+                subscription.accountId().value(),
+                plan.id().value(),
+                plan.groupId(),
                 transactionId,
                 subscription.dueDate(),
-                plan.price(),
+                plan.price().currency().getCurrencyCode(),
+                plan.price().amount(),
                 subscription.lastRenewDate(),
                 InstantUtils.now()
         );

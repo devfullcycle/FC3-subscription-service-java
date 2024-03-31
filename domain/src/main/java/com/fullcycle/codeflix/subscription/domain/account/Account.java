@@ -1,6 +1,7 @@
 package com.fullcycle.codeflix.subscription.domain.account;
 
 import com.fullcycle.codeflix.subscription.domain.AggregateRoot;
+import com.fullcycle.codeflix.subscription.domain.account.iam.UserId;
 import com.fullcycle.codeflix.subscription.domain.person.Address;
 import com.fullcycle.codeflix.subscription.domain.person.Document;
 import com.fullcycle.codeflix.subscription.domain.person.Email;
@@ -11,6 +12,7 @@ public class Account extends AggregateRoot<AccountId> {
     private static final int INIT_VERSION = 0;
 
     private int version;
+    private UserId userId;
     private Email email;
     private Name name;
     private Document document;
@@ -19,6 +21,7 @@ public class Account extends AggregateRoot<AccountId> {
     private Account(
             final AccountId accountId,
             final int version,
+            final UserId userId,
             final Email email,
             final Name name,
             final Document document,
@@ -26,14 +29,15 @@ public class Account extends AggregateRoot<AccountId> {
     ) {
         super(accountId);
         setVersion(version);
+        setUserId(userId);
         setEmail(email);
         setName(name);
         setDocument(document);
         setBillingAddress(billingAddress);
     }
 
-    public static Account newAccount(final AccountId accountId, final Email email, final Name name, final Document document) {
-        final var aNewAccount = new Account(accountId, INIT_VERSION, email, name, document, null);
+    public static Account newAccount(final AccountId accountId, final UserId userId, final Email email, final Name name, final Document document) {
+        final var aNewAccount = new Account(accountId, INIT_VERSION, userId, email, name, document, null);
         aNewAccount.registerEvent(new AccountCreated(aNewAccount));
         return aNewAccount;
     }
@@ -41,12 +45,13 @@ public class Account extends AggregateRoot<AccountId> {
     public static Account with(
             final AccountId accountId,
             final int version,
+            final UserId userId,
             final Email email,
             final Name name,
             final Document document,
             final Address billingAddress
     ) {
-        return new Account(accountId, version, email, name, document, billingAddress);
+        return new Account(accountId, version, userId, email, name, document, billingAddress);
     }
 
     public Account execute(final AccountCommand... cmds) {
@@ -63,6 +68,10 @@ public class Account extends AggregateRoot<AccountId> {
 
     public int version() {
         return version;
+    }
+
+    public UserId userId() {
+        return userId;
     }
 
     public Email email() {
@@ -103,6 +112,11 @@ public class Account extends AggregateRoot<AccountId> {
 
     private void setVersion(final int version) {
         this.version = version;
+    }
+
+    private void setUserId(final UserId userId) {
+        this.assertArgumentNotNull(userId, "'userId' should not be null");
+        this.userId = userId;
     }
 
     private void setEmail(final Email email) {

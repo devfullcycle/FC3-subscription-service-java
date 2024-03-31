@@ -3,6 +3,7 @@ package com.fullcycle.codeflix.subscription.infrastructure.gateways.repositories
 import com.fullcycle.codeflix.subscription.domain.account.Account;
 import com.fullcycle.codeflix.subscription.domain.account.AccountGateway;
 import com.fullcycle.codeflix.subscription.domain.account.AccountId;
+import com.fullcycle.codeflix.subscription.domain.account.iam.UserId;
 import com.fullcycle.codeflix.subscription.domain.person.Address;
 import com.fullcycle.codeflix.subscription.domain.person.Document;
 import com.fullcycle.codeflix.subscription.domain.person.Email;
@@ -18,7 +19,7 @@ import java.util.*;
 @Repository
 public class AccountRepository implements AccountGateway {
 
-    private static final RowMapping<Account> accountRowMapping = userRowMapping();
+    private static final RowMapping<Account> rowMapping = userRowMapping();
 
     private final DatabaseClient database;
     private final EventRepository eventRepository;
@@ -35,14 +36,14 @@ public class AccountRepository implements AccountGateway {
 
     @Override
     public List<Account> allAccounts() {
-        final var sql = "SELECT id, version, email, firstname, lastname, address_zip_code, address_number, address_complement, address_country, document_number, document_type FROM accounts";
-        return this.database.query(sql, Map.of(), accountRowMapping);
+        final var sql = "SELECT id, version, iam_user_id, email, firstname, lastname, address_zip_code, address_number, address_complement, address_country, document_number, document_type FROM accounts";
+        return this.database.query(sql, Map.of(), rowMapping);
     }
 
     @Override
     public Optional<Account> accountOfId(final AccountId accountId) {
-        final var sql = "SELECT id, version, email, firstname, lastname, address_zip_code, address_number, address_complement, address_country, document_number, document_type FROM accounts WHERE id = :id";
-        final var rows = this.database.query(sql, Map.of("id", accountId.value()), accountRowMapping);
+        final var sql = "SELECT id, version, iam_user_id, email, firstname, lastname, address_zip_code, address_number, address_complement, address_country, document_number, document_type FROM accounts WHERE id = :id";
+        final var rows = this.database.query(sql, Map.of("id", accountId.value()), rowMapping);
         if (rows.isEmpty()) {
             return Optional.empty();
         }
@@ -63,8 +64,8 @@ public class AccountRepository implements AccountGateway {
 
     private Account create(final Account user) {
         final var sql = """
-                INSERT INTO accounts (id, version, email, firstname, lastname, address_zip_code, address_number, address_complement, address_country, document_number, document_type)
-                VALUES (:id, (:version + 1), :email, :firstname, :lastname, :address_zip_code, :address_number, :address_complement, :address_country, :document_number, :document_type)
+                INSERT INTO accounts (id, version, iam_user_id, email, firstname, lastname, address_zip_code, address_number, address_complement, address_country, document_number, document_type)
+                VALUES (:id, (:version + 1), :userId, :email, :firstname, :lastname, :address_zip_code, :address_number, :address_complement, :address_country, :document_number, :document_type)
                 """;
         executeUpdate(sql, user);
         return user;
@@ -75,6 +76,7 @@ public class AccountRepository implements AccountGateway {
                 UPDATE accounts
                 SET
                     version = (:version + 1),
+                    iam_user_id = :userId,
                     email = :email,
                     firstname = :firstname,
                     lastname = :lastname,
@@ -98,6 +100,7 @@ public class AccountRepository implements AccountGateway {
         final var params = new HashMap<String, Object>();
         params.put("id", user.id().value());
         params.put("version", user.version());
+        params.put("userId", user.userId().value());
         params.put("email", user.email().value());
         params.put("firstname", user.name().firstname());
         params.put("lastname", user.name().lastname());
@@ -121,6 +124,7 @@ public class AccountRepository implements AccountGateway {
         return rs -> Account.with(
                 new AccountId(rs.getString("id")),
                 rs.getInt("version"),
+                new UserId(rs.getString("iam_user_id")),
                 new Email(rs.getString("email")),
                 new Name(rs.getString("firstname"), rs.getString("lastname")),
                 Document.create(

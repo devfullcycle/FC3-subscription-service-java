@@ -6,8 +6,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "keycloak")
 public class KeycloakProperties {
+
     private String clientId;
     private String clientSecret;
+    private String adminUri;
+    private String realmUri;
     private String tokenUri;
 
     public String clientId() {
@@ -32,5 +35,21 @@ public class KeycloakProperties {
 
     public void setTokenUri(String tokenUri) {
         this.tokenUri = tokenUri;
+    }
+
+    public String adminUri() {
+        return adminUri;
+    }
+
+    public void setAdminUri(String adminUri) {
+        this.adminUri = adminUri;
+    }
+
+    public String realmUri() {
+        return realmUri;
+    }
+
+    public void setRealmUri(String realmUri) {
+        this.realmUri = realmUri;
     }
 }

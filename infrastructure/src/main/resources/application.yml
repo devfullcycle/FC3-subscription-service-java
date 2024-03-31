@@ -1,10 +1,11 @@
 
 keycloak:
+  admin-uri: ${keycloak.host}/admin/realms/${keycloak.realm}
+  realm-uri: ${keycloak.host}/realms/${keycloak.realm}
   token-uri: /protocol/openid-connect/token
 
 rest-client:
   keycloak:
-    base-url: "${keycloak.host}/realms/${keycloak.realm}"
     read-timeout: 1_000
 
 server:

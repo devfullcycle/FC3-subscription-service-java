@@ -2,6 +2,7 @@ CREATE TABLE accounts
 (
     id                 VARCHAR(32)  NOT NULL PRIMARY KEY,
     version            SMALLINT     NOT NULL DEFAULT 0,
+    iam_user_id        VARCHAR(255) NOT NULL UNIQUE,
     email              VARCHAR(255) NOT NULL UNIQUE,
     firstname          VARCHAR(255) NOT NULL,
     lastname           VARCHAR(255) NOT NULL,
@@ -37,3 +38,20 @@ CREATE TABLE plans
     currency    VARCHAR(3)     NOT NULL,
     amount      DECIMAL(15, 2) NOT NULL
 );
+
+CREATE TABLE subscriptions
+(
+    id                  VARCHAR(32)  NOT NULL PRIMARY KEY,
+    version             SMALLINT     NOT NULL DEFAULT 0,
+    account_id          VARCHAR(32)  NOT NULL,
+    plan_id             VARCHAR(32)  NOT NULL,
+    status              VARCHAR(32)  NOT NULL,
+    created_at          TIMESTAMP(6) NOT NULL,
+    updated_at          TIMESTAMP(6) NOT NULL,
+    due_date            DATE         NOT NULL,
+    last_renew_dt       TIMESTAMP(6) NOT NULL,
+    last_transaction_id VARCHAR(32)  NOT NULL
+);
+
+CREATE INDEX idx_subscriptions_account ON subscriptions (account_id);
+CREATE INDEX idx_subscriptions_due_date ON subscriptions (due_date);

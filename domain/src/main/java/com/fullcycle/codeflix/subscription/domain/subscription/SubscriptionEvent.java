@@ -6,13 +6,13 @@ public interface SubscriptionEvent extends DomainEvent {
 
     String AGGREGATE_TYPE = "Subscription";
 
-    SubscriptionId subscriptionId();
+    String subscriptionId();
 
     @Override
     default String aggregateId() {
-        return subscriptionId().value();
+        return subscriptionId();
     }
-    
+
     @Override
     default String aggregateType() {
         return AGGREGATE_TYPE;

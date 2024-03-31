@@ -2,11 +2,11 @@ package com.fullcycle.codeflix.subscription.infrastructure.gateways.repositories
 
 import com.fullcycle.codeflix.subscription.AbstractRepositoryTest;
 import com.fullcycle.codeflix.subscription.domain.account.*;
+import com.fullcycle.codeflix.subscription.domain.account.iam.UserId;
 import com.fullcycle.codeflix.subscription.domain.person.Address;
 import com.fullcycle.codeflix.subscription.domain.person.Document;
 import com.fullcycle.codeflix.subscription.domain.person.Email;
 import com.fullcycle.codeflix.subscription.domain.person.Name;
-import com.fullcycle.codeflix.subscription.infrastructure.configuration.json.Json;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.jdbc.Sql;
@@ -14,7 +14,7 @@ import org.springframework.test.context.jdbc.Sql;
 public class AccountRepositoryTest extends AbstractRepositoryTest {
 
     @Test
-    @Sql({"classpath:/sql/users/seed-accounts.sql"})
+    @Sql({"classpath:/sql/accounts/seed-accounts.sql"})
     public void testListAll() {
         final var expectedUsers = 2;
         final var actualUsers = this.accountRepository().allAccounts();
@@ -28,11 +28,12 @@ public class AccountRepositoryTest extends AbstractRepositoryTest {
 
         final var expectedId = new AccountId("123");
         final var expectedVersion = 1;
+        final var expectedUserId = new UserId("456");
         final var expectedEmail = new Email("john@email.com");
         final var expectedName = new Name("John", "Doe");
         final var expectedDocument = Document.create("12332112322", Document.Cpf.TYPE);
 
-        final var john = Account.newAccount(expectedId, expectedEmail, expectedName, expectedDocument);
+        final var john = Account.newAccount(expectedId, expectedUserId, expectedEmail, expectedName, expectedDocument);
 
         // when
         this.accountRepository().save(john);
@@ -64,12 +65,13 @@ public class AccountRepositoryTest extends AbstractRepositoryTest {
 
         final var expectedId = new AccountId("123");
         final var expectedVersion = 1;
+        final var expectedUserId = new UserId("456");
         final var expectedEmail = new Email("john@email.com");
         final var expectedName = new Name("John", "Doe");
         final var expectedDocument = Document.create("12332112322", Document.Cpf.TYPE);
         final var expectedAddress = new Address("01123909", "1", "03", "US");
 
-        final var john = Account.newAccount(expectedId, expectedEmail, expectedName, expectedDocument);
+        final var john = Account.newAccount(expectedId, expectedUserId, expectedEmail, expectedName, expectedDocument);
         john.execute(new AccountCommand.ChangeBillingAddressCommand(expectedAddress));
 
         // when
@@ -96,7 +98,7 @@ public class AccountRepositoryTest extends AbstractRepositoryTest {
     }
 
     @Test
-    @Sql({"classpath:/sql/users/seed-johndoe.sql"})
+    @Sql({"classpath:/sql/accounts/seed-johndoe.sql"})
     public void testUpdateUserWithAddress() {
         // given
         Assertions.assertEquals(1, this.accountRepository().allAccounts().size());

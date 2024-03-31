@@ -1,9 +1,9 @@
 package com.fullcycle.codeflix.subscription.infrastructure.gateways.clients;
 
 import com.fullcycle.codeflix.subscription.domain.exceptions.InternalErrorException;
-import com.fullcycle.codeflix.subscription.infrastructure.authentication.AuthenticationGateway;
 import com.fullcycle.codeflix.subscription.infrastructure.configuration.annotations.Keycloak;
 import com.fullcycle.codeflix.subscription.infrastructure.configuration.properties.KeycloakProperties;
+import com.fullcycle.codeflix.subscription.infrastructure.gateways.AuthenticationGateway;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -19,10 +19,12 @@ public class KeycloakAuthenticationClient implements AuthenticationGateway {
 
     public KeycloakAuthenticationClient(
             @Keycloak final RestClient.Builder restClient,
-            final KeycloakProperties keycloakProperties
+            final KeycloakProperties properties
     ) {
-        this.restClient = Objects.requireNonNull(restClient).build();
-        this.tokenUri =  Objects.requireNonNull(keycloakProperties).tokenUri();
+        this.tokenUri = Objects.requireNonNull(properties).tokenUri();
+        this.restClient = Objects.requireNonNull(restClient)
+                .baseUrl(properties.realmUri())
+                .build();
     }
 
     @Override

@@ -1,10 +1,10 @@
 package com.fullcycle.codeflix.subscription;
 
-import com.fullcycle.codeflix.subscription.infrastructure.database.DatabaseClient;
 import com.fullcycle.codeflix.subscription.infrastructure.database.JdbcClientAdapter;
 import com.fullcycle.codeflix.subscription.infrastructure.gateways.repositories.AccountRepository;
 import com.fullcycle.codeflix.subscription.infrastructure.gateways.repositories.EventRepository;
 import com.fullcycle.codeflix.subscription.infrastructure.gateways.repositories.PlanRepository;
+import com.fullcycle.codeflix.subscription.infrastructure.gateways.repositories.SubscriptionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,24 +15,28 @@ import static org.springframework.test.jdbc.JdbcTestUtils.countRowsInTable;
 
 @DataJdbcTest
 @Tag("integrationTest")
-public abstract class AbstractRepositoryTest {
+public abstract class AbstractRepositoryTest extends AbstractTest {
 
     protected static final String ACCOUNTS = "accounts";
     protected static final String EVENTS = "events";
     protected static final String PLANS = "plans";
+    protected static final String SUBSCRIPTIONS = "subscriptions";
 
     @Autowired
     private JdbcClient jdbcClient;
 
-    private AccountRepository accountRepository;
     private EventRepository eventRepository;
+    private AccountRepository accountRepository;
     private PlanRepository planRepository;
+    private SubscriptionRepository subscriptionRepository;
 
     @BeforeEach
     void setUp() {
-        this.eventRepository = new EventRepository(dbClient());
-        this.accountRepository = new AccountRepository(dbClient(), eventRepository);
-        this.planRepository = new PlanRepository(dbClient());
+        final var dbClient = new JdbcClientAdapter(jdbcClient);
+        this.eventRepository = new EventRepository(dbClient);
+        this.accountRepository = new AccountRepository(dbClient, eventRepository);
+        this.planRepository = new PlanRepository(dbClient);
+        this.subscriptionRepository = new SubscriptionRepository(dbClient, eventRepository);
     }
 
     protected AccountRepository accountRepository() {
@@ -47,6 +51,10 @@ public abstract class AbstractRepositoryTest {
         return planRepository;
     }
 
+    protected SubscriptionRepository subscriptionRepository() {
+        return subscriptionRepository;
+    }
+
     protected int countAccounts() {
         return countRowsInTable(jdbcClient, ACCOUNTS);
     }
@@ -59,11 +67,11 @@ public abstract class AbstractRepositoryTest {
         return countRowsInTable(jdbcClient, PLANS);
     }
 
-    private int countTable(final String table) {
-        return countRowsInTable(jdbcClient, table);
+    protected int countSubscriptions() {
+        return countRowsInTable(jdbcClient, SUBSCRIPTIONS);
     }
 
-    private DatabaseClient dbClient() {
-        return new JdbcClientAdapter(jdbcClient);
+    private int countTable(final String table) {
+        return countRowsInTable(jdbcClient, table);
     }
 }

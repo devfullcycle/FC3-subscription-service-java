@@ -3,16 +3,17 @@ package com.fullcycle.codeflix.subscription.application.subscription.impl;
 import com.fullcycle.codeflix.subscription.application.subscription.CreateSubscription;
 import com.fullcycle.codeflix.subscription.domain.AggregateRoot;
 import com.fullcycle.codeflix.subscription.domain.Identifier;
+import com.fullcycle.codeflix.subscription.domain.account.Account;
+import com.fullcycle.codeflix.subscription.domain.account.AccountGateway;
+import com.fullcycle.codeflix.subscription.domain.account.AccountId;
 import com.fullcycle.codeflix.subscription.domain.exceptions.DomainException;
+import com.fullcycle.codeflix.subscription.domain.plan.Plan;
 import com.fullcycle.codeflix.subscription.domain.plan.PlanGateway;
 import com.fullcycle.codeflix.subscription.domain.plan.PlanId;
 import com.fullcycle.codeflix.subscription.domain.plan.PlanNotFoundException;
 import com.fullcycle.codeflix.subscription.domain.subscription.ActiveSubscriptionException;
 import com.fullcycle.codeflix.subscription.domain.subscription.Subscription;
 import com.fullcycle.codeflix.subscription.domain.subscription.SubscriptionGateway;
-import com.fullcycle.codeflix.subscription.domain.account.Account;
-import com.fullcycle.codeflix.subscription.domain.account.AccountGateway;
-import com.fullcycle.codeflix.subscription.domain.account.AccountId;
 import com.fullcycle.codeflix.subscription.domain.validation.ValidationError;
 
 import java.util.Objects;
@@ -38,13 +39,15 @@ public class DefaultCreateSubscription extends CreateSubscription {
         final var userId = new AccountId(in.userId());
         final var planId = new PlanId(in.planId());
 
-        validatePlanExistence(planId);
         validateSubscriptionExistence(userId);
 
-        final var user = accountGateway.accountOfId(userId)
+        final var plan = this.planGateway.planOfId(planId)
+                .orElseThrow(() -> new PlanNotFoundException(planId));
+
+        final var account = accountGateway.accountOfId(userId)
                 .orElseThrow(() -> notFound(Account.class, userId));
 
-        final var subscription = newSubscriptionWith(user, planId);
+        final var subscription = newSubscriptionWith(account, plan);
         subscriptionGateway.save(subscription);
 
         return new StdOutput(subscription.id().value());
@@ -64,11 +67,11 @@ public class DefaultCreateSubscription extends CreateSubscription {
         });
     }
 
-    private Subscription newSubscriptionWith(final Account user, final PlanId planId) {
+    private Subscription newSubscriptionWith(final Account user, final Plan plan) {
         return Subscription.newSubscription(
                 this.subscriptionGateway.nextId(),
                 user.id(),
-                planId
+                plan
         );
     }
 
