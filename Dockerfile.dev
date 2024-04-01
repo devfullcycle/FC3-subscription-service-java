@@ -3,7 +3,7 @@
 # docker run fc3-subscription
 
 # build stage
-FROM gradle:7.6.1-jdk17-alpine AS builder
+FROM gradle:8.7.0-jdk21-alpine AS builder
 
 WORKDIR /usr/app/
 
@@ -12,7 +12,7 @@ COPY . .
 RUN gradle bootJar
 
 # build runtime
-FROM eclipse-temurin:17.0.5_8-jre-alpine
+FROM eclipse-temurin:21.0.2_13-jre-alpine
 
 COPY --from=builder /usr/app/build/libs/*.jar /opt/app/application.jar
 
