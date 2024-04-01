@@ -1,0 +1,4 @@
+rootProject.name = 'FC3-subscription-service-java'
+include 'domain'
+include 'application'
+include 'infrastructure'

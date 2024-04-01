@@ -1,0 +1,55 @@
+plugins {
+    id 'java'
+    id 'jacoco'
+}
+
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    junit = "5.10.2"
+    mockito = "5.11.0"
+    snakeyaml = "2.2"
+    vavr = "0.10.4"
+}
+
+dependencies {
+    implementation("io.vavr:vavr:$vavr")
+
+    implementation("org.yaml:snakeyaml:$snakeyaml") {
+        version { strictly("$snakeyaml") }
+    }
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:$junit")
+    testImplementation("org.mockito:mockito-junit-jupiter:$mockito")
+
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junit")
+}
+
+jacoco {
+    toolVersion = "0.8.11"
+}
+
+tasks.named("test") {
+    useJUnitPlatform()
+}
+
+task unitTests(type: Test, group: "verification") {
+    useJUnitPlatform {
+        includeTags("unitTest")
+    }
+}
+task integrationTests(type: Test, group: "verification") {
+    useJUnitPlatform {
+        includeTags("integrationTest")
+    }
+}
+
+task e2eTests(type: Test, group: "verification") {
+    useJUnitPlatform {
+        includeTags("e2eTest")
+    }
+}
