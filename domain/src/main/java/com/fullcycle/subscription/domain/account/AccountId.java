@@ -5,6 +5,6 @@ import com.fullcycle.subscription.domain.Identifier;
 public record AccountId(String value) implements Identifier {
 
     public AccountId {
-        this.assertArgumentNotNull(value, "'accountId' should not be null");
+        this.assertArgumentNotEmpty(value, "'accountId' should not be empty");
     }
 }

@@ -24,4 +24,10 @@ public interface AssertionConcern {
         }
         return val;
     }
+
+    default void assertConditionTrue(Boolean val, String aMessage) {
+        if (Boolean.FALSE.equals(val)) {
+            throw DomainException.with(aMessage);
+        }
+    }
 }
