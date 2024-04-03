@@ -1,6 +1,10 @@
 package com.fullcycle.subscription.domain.account;
 
 import com.fullcycle.subscription.domain.AggregateRoot;
+import com.fullcycle.subscription.domain.account.AccountCommand.ChangeDocumentCommand;
+import com.fullcycle.subscription.domain.account.AccountCommand.ChangeEmailCommand;
+import com.fullcycle.subscription.domain.account.AccountCommand.ChangeProfileCommand;
+import com.fullcycle.subscription.domain.account.AccountEvent.AccountCreated;
 import com.fullcycle.subscription.domain.account.iam.UserId;
 import com.fullcycle.subscription.domain.person.Address;
 import com.fullcycle.subscription.domain.person.Document;
@@ -41,7 +45,9 @@ public class Account extends AggregateRoot<AccountId> {
             final Name aName,
             final Document aDocument
     ) {
-        return new Account(anAccountId, 0, anUserId, anEmail, aName, aDocument, null);
+        final var anAccount = new Account(anAccountId, 0, anUserId, anEmail, aName, aDocument, null);
+        anAccount.registerEvent(new AccountCreated(anAccount));
+        return anAccount;
     }
 
     public static Account with(
@@ -63,9 +69,9 @@ public class Account extends AggregateRoot<AccountId> {
 
         for (var cmd : cmds) {
             switch (cmd) {
-                case AccountCommand.ChangeProfileCommand c -> apply(c);
-                case AccountCommand.ChangeDocumentCommand c -> apply(c);
-                case AccountCommand.ChangeEmailCommand c -> apply(c);
+                case ChangeProfileCommand c -> apply(c);
+                case ChangeDocumentCommand c -> apply(c);
+                case ChangeEmailCommand c -> apply(c);
             }
         }
     }
@@ -94,16 +100,16 @@ public class Account extends AggregateRoot<AccountId> {
         return billingAddress;
     }
 
-    private void apply(final AccountCommand.ChangeProfileCommand cmd) {
+    private void apply(final ChangeProfileCommand cmd) {
         this.setName(cmd.aName());
         this.setBillingAddress(cmd.aBillingAddress());
     }
 
-    private void apply(final AccountCommand.ChangeDocumentCommand cmd) {
+    private void apply(final ChangeDocumentCommand cmd) {
         this.setDocument(cmd.aDocument());
     }
 
-    private void apply(final AccountCommand.ChangeEmailCommand cmd) {
+    private void apply(final ChangeEmailCommand cmd) {
         this.setEmail(cmd.anEmail());
     }
 
