@@ -43,6 +43,34 @@ public class PlanTest {
     }
 
     @Test
+    public void givenNullActive_whenCallsNewPlan_ShouldInstantiate() {
+        // given
+        var expectedId = new PlanId("PLN-123");
+        var expectedVersion = 0;
+        var expectedName = "Plus";
+        var expectedDescription = """
+                Lero lero
+                """;
+        var expectedActive = false;
+        var expectedPrice = new MonetaryAmount("BRL", 20.99);
+
+        // when
+        var actualPlan = Plan.newPlan(expectedId, expectedName, expectedDescription, null, expectedPrice);
+
+        // then
+        Assertions.assertNotNull(actualPlan);
+        Assertions.assertEquals(expectedId, actualPlan.id());
+        Assertions.assertEquals(expectedVersion, actualPlan.version());
+        Assertions.assertEquals(expectedName, actualPlan.name());
+        Assertions.assertEquals(expectedDescription, actualPlan.description());
+        Assertions.assertEquals(expectedActive, actualPlan.active());
+        Assertions.assertEquals(expectedPrice, actualPlan.price());
+        Assertions.assertNotNull(actualPlan.createdAt());
+        Assertions.assertNotNull(actualPlan.updatedAt());
+        Assertions.assertNotNull(actualPlan.deletedAt());
+    }
+
+    @Test
     public void givenValidParams_whenCallsWith_ShouldInstantiate() {
         // given
         var expectedId = new PlanId("PLN-123");
@@ -212,13 +240,15 @@ public class PlanTest {
     @Test
     public void givenNullActive_whenCallsWith_ShouldReturnFalse() {
         // given
+        var expectedMessage = "'active' should not be null";
+
         var expectedId = new PlanId("123");
         var expectedVersion = 0;
         var expectedName = "Plus";
         var expectedDescription = """
                 Lero lero
                 """;
-        var expectedActive = false;
+        Boolean expectedActive = null;
         var expectedPrice = new MonetaryAmount("BRL", 20.99);
         var expectedCreatedAt = InstantUtils.now();
         var expectedUpdatedAt = InstantUtils.now();
@@ -226,19 +256,13 @@ public class PlanTest {
 
 
         // when
-        var actualPlan = Plan.with(expectedId, expectedVersion, expectedName, expectedDescription, null, expectedPrice, expectedCreatedAt, expectedUpdatedAt, expectedDeletedAt);
+        var actualError = Assertions.assertThrows(
+                DomainException.class,
+                () -> Plan.with(expectedId, expectedVersion, expectedName, expectedDescription, expectedActive, expectedPrice, expectedCreatedAt, expectedUpdatedAt, expectedDeletedAt)
+        );
 
         // then
-        Assertions.assertNotNull(actualPlan);
-        Assertions.assertEquals(expectedId, actualPlan.id());
-        Assertions.assertEquals(expectedVersion, actualPlan.version());
-        Assertions.assertEquals(expectedName, actualPlan.name());
-        Assertions.assertEquals(expectedDescription, actualPlan.description());
-        Assertions.assertEquals(expectedActive, actualPlan.active());
-        Assertions.assertEquals(expectedPrice, actualPlan.price());
-        Assertions.assertEquals(expectedCreatedAt, actualPlan.createdAt());
-        Assertions.assertEquals(expectedUpdatedAt, actualPlan.updatedAt());
-        Assertions.assertEquals(expectedDeletedAt, actualPlan.deletedAt());
+        Assertions.assertEquals(expectedMessage, actualError.getMessage());
     }
 
     @Test
@@ -249,7 +273,7 @@ public class PlanTest {
         var expectedId = new PlanId("123");
         var expectedVersion = 0;
         var expectedName = "Plus";
-        String expectedDescription = null;
+        var expectedDescription = "description";
         var expectedActive = false;
         MonetaryAmount expectedPrice = null;
         var expectedCreatedAt = InstantUtils.now();
@@ -284,7 +308,7 @@ public class PlanTest {
 
 
         // when
-        var actualPlan = Plan.with(expectedId, expectedVersion, expectedName, expectedDescription, null, expectedPrice, expectedCreatedAt, expectedUpdatedAt, expectedDeletedAt);
+        var actualPlan = Plan.with(expectedId, expectedVersion, expectedName, expectedDescription, expectedActive, expectedPrice, expectedCreatedAt, expectedUpdatedAt, expectedDeletedAt);
 
         // then
         Assertions.assertNotNull(actualPlan);
@@ -356,20 +380,22 @@ public class PlanTest {
     @Test
     public void givenNullDeletedAt_whenCallsWith_ShouldReturnOK() {
         // given
+        var expectedMessage = "'active' should not be null";
+
         var expectedId = new PlanId("123");
         var expectedVersion = 0;
         var expectedName = "Plus";
         var expectedDescription = """
                 lero lero
                 """;
-        var expectedActive = false;
+        var expectedActive = true;
         var expectedPrice = new MonetaryAmount("BRL", 0.0);
         var expectedCreatedAt = InstantUtils.now();
         var expectedUpdatedAt = InstantUtils.now();
         Instant expectedDeletedAt = null;
 
         // when
-        var actualPlan = Plan.with(expectedId, expectedVersion, expectedName, expectedDescription, null, expectedPrice, expectedCreatedAt, expectedUpdatedAt, expectedDeletedAt);
+        var actualPlan = Plan.with(expectedId, expectedVersion, expectedName, expectedDescription, expectedActive, expectedPrice, expectedCreatedAt, expectedUpdatedAt, expectedDeletedAt);
 
         // then
         Assertions.assertNotNull(actualPlan);
