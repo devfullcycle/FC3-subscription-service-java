@@ -64,6 +64,43 @@ public class Plan extends AggregateRoot<PlanId> {
         return new Plan(planId, aVersion, aName, aDescription, anActive, aPrice, createdAt, updatedAt, deletedAt);
     }
 
+    public void execute(final PlanCommand... cmds) {
+        if (cmds == null) {
+            return;
+        }
+
+        for (var cmd : cmds) {
+            switch (cmd) {
+                case PlanCommand.ActivatePlan c -> apply(c);
+                case PlanCommand.ChangePlan c -> apply(c);
+                case PlanCommand.InactivatePlan c -> apply(c);
+            }
+        }
+
+        this.setVersion(version() + 1);
+        this.setUpdatedAt(InstantUtils.now());
+    }
+
+    private void apply(final PlanCommand.ActivatePlan cmd) {
+        this.setDeletedAt(null);
+        this.setActive(true);
+    }
+
+    private void apply(final PlanCommand.ChangePlan cmd) {
+        this.setName(cmd.name());
+        this.setDescription(cmd.description());
+        if (Boolean.TRUE.equals(cmd.active())) {
+            apply(new PlanCommand.ActivatePlan());
+        } else {
+            apply(new PlanCommand.InactivatePlan());
+        }
+    }
+
+    private void apply(final PlanCommand.InactivatePlan cmd) {
+        this.setDeletedAt(deletedAt != null ? deletedAt : InstantUtils.now());
+        this.setActive(false);
+    }
+
     public int version() {
         return version;
     }

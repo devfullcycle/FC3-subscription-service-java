@@ -380,8 +380,6 @@ public class PlanTest {
     @Test
     public void givenNullDeletedAt_whenCallsWith_ShouldReturnOK() {
         // given
-        var expectedMessage = "'active' should not be null";
-
         var expectedId = new PlanId("123");
         var expectedVersion = 0;
         var expectedName = "Plus";
@@ -408,5 +406,128 @@ public class PlanTest {
         Assertions.assertEquals(expectedCreatedAt, actualPlan.createdAt());
         Assertions.assertEquals(expectedUpdatedAt, actualPlan.updatedAt());
         Assertions.assertEquals(expectedDeletedAt, actualPlan.deletedAt());
+    }
+
+    @Test
+    public void givenPlan_whenExecuteWithoutCommands_ShouldDoNothing() {
+        // given
+        var expectedId = new PlanId("PLN-123");
+        var expectedVersion = 1;
+        var expectedName = "Plus";
+        var expectedDescription = """
+                Lero lero
+                """;
+        var expectedActive = true;
+        var expectedPrice = new MonetaryAmount("BRL", 20.99);
+
+        var actualPlan = Plan.newPlan(expectedId, expectedName, expectedDescription, expectedActive, expectedPrice);
+
+        // when
+        actualPlan.execute();
+
+        // then
+        Assertions.assertNotNull(actualPlan);
+        Assertions.assertEquals(expectedVersion, actualPlan.version());
+        Assertions.assertEquals(expectedName, actualPlan.name());
+        Assertions.assertEquals(expectedDescription, actualPlan.description());
+        Assertions.assertEquals(expectedActive, actualPlan.active());
+        Assertions.assertEquals(expectedPrice, actualPlan.price());
+        Assertions.assertNotNull(actualPlan.createdAt());
+        Assertions.assertNotNull(actualPlan.updatedAt());
+        Assertions.assertNull(actualPlan.deletedAt());
+    }
+
+    @Test
+    public void givenInactivePlan_whenExecuteActiveCommand_ShouldActivate() throws InterruptedException {
+        // given
+        var expectedId = new PlanId("PLN-123");
+        var expectedVersion = 1;
+        var expectedName = "Plus";
+        var expectedDescription = """
+                Lero lero
+                """;
+        var expectedActive = true;
+        var expectedPrice = new MonetaryAmount("BRL", 20.99);
+
+        var actualPlan = Plan.newPlan(expectedId, expectedName, expectedDescription, false, expectedPrice);
+        Assertions.assertFalse(actualPlan.active());
+        Assertions.assertNotNull(actualPlan.deletedAt());
+        Thread.sleep(1); // Sleep for updatedAt time change
+
+        // when
+        actualPlan.execute(new PlanCommand.ActivatePlan());
+
+        // then
+        Assertions.assertNotNull(actualPlan);
+        Assertions.assertEquals(expectedVersion, actualPlan.version());
+        Assertions.assertEquals(expectedName, actualPlan.name());
+        Assertions.assertEquals(expectedDescription, actualPlan.description());
+        Assertions.assertEquals(expectedActive, actualPlan.active());
+        Assertions.assertEquals(expectedPrice, actualPlan.price());
+        Assertions.assertNotNull(actualPlan.createdAt());
+        Assertions.assertTrue(actualPlan.createdAt().isBefore(actualPlan.updatedAt()));
+        Assertions.assertNull(actualPlan.deletedAt());
+    }
+
+    @Test
+    public void givenActivePlan_whenExecuteInactivateCommand_ShouldInactivate() throws InterruptedException {
+        // given
+        var expectedId = new PlanId("PLN-123");
+        var expectedVersion = 1;
+        var expectedName = "Plus";
+        var expectedDescription = """
+                Lero lero
+                """;
+        var expectedActive = false;
+        var expectedPrice = new MonetaryAmount("BRL", 20.99);
+
+        var actualPlan = Plan.newPlan(expectedId, expectedName, expectedDescription, true, expectedPrice);
+        Assertions.assertTrue(actualPlan.active());
+        Assertions.assertNull(actualPlan.deletedAt());
+        Thread.sleep(1); // Sleep for updatedAt time change
+
+        // when
+        actualPlan.execute(new PlanCommand.InactivatePlan());
+
+        // then
+        Assertions.assertNotNull(actualPlan);
+        Assertions.assertEquals(expectedVersion, actualPlan.version());
+        Assertions.assertEquals(expectedName, actualPlan.name());
+        Assertions.assertEquals(expectedDescription, actualPlan.description());
+        Assertions.assertEquals(expectedActive, actualPlan.active());
+        Assertions.assertEquals(expectedPrice, actualPlan.price());
+        Assertions.assertNotNull(actualPlan.createdAt());
+        Assertions.assertTrue(actualPlan.createdAt().isBefore(actualPlan.updatedAt()));
+        Assertions.assertNotNull(actualPlan.deletedAt());
+    }
+
+    @Test
+    public void givenPlan_whenExecuteChangeCommand_ShouldUpdateAttributes() throws InterruptedException {
+        // given
+        var expectedId = new PlanId("PLN-123");
+        var expectedVersion = 1;
+        var expectedName = "Plus";
+        var expectedDescription = """
+                Lero lero
+                """;
+        var expectedActive = true;
+        var expectedPrice = new MonetaryAmount("BRL", 20.99);
+
+        var actualPlan = Plan.newPlan(expectedId, "Freemium", "Lá", false, expectedPrice);
+        Thread.sleep(1); // Sleep for updatedAt time change
+
+        // when
+        actualPlan.execute(new PlanCommand.ChangePlan(expectedName, expectedDescription, expectedActive));
+
+        // then
+        Assertions.assertNotNull(actualPlan);
+        Assertions.assertEquals(expectedVersion, actualPlan.version());
+        Assertions.assertEquals(expectedName, actualPlan.name());
+        Assertions.assertEquals(expectedDescription, actualPlan.description());
+        Assertions.assertEquals(expectedActive, actualPlan.active());
+        Assertions.assertEquals(expectedPrice, actualPlan.price());
+        Assertions.assertNotNull(actualPlan.createdAt());
+        Assertions.assertTrue(actualPlan.createdAt().isBefore(actualPlan.updatedAt()));
+        Assertions.assertNull(actualPlan.deletedAt());
     }
 }
