@@ -17,7 +17,7 @@ public class PlanTest {
     @Test
     public void givenValidParams_whenCallsNewPlan_ShouldInstantiate() {
         // given
-        var expectedId = new PlanId("PLN-123");
+        var expectedId = new PlanId(123L);
         var expectedVersion = 0;
         var expectedName = "Plus";
         var expectedDescription = """
@@ -45,7 +45,7 @@ public class PlanTest {
     @Test
     public void givenNullActive_whenCallsNewPlan_ShouldInstantiate() {
         // given
-        var expectedId = new PlanId("PLN-123");
+        var expectedId = new PlanId(123L);
         var expectedVersion = 0;
         var expectedName = "Plus";
         var expectedDescription = """
@@ -73,7 +73,7 @@ public class PlanTest {
     @Test
     public void givenValidParams_whenCallsWith_ShouldInstantiate() {
         // given
-        var expectedId = new PlanId("PLN-123");
+        var expectedId = new PlanId(123L);
         var expectedVersion = 0;
         var expectedName = "Plus";
         var expectedDescription = """
@@ -134,7 +134,7 @@ public class PlanTest {
         // given
         var expectedMessage = "'name' should not be empty";
 
-        var expectedId = new PlanId("123");
+        var expectedId = new PlanId(123L);
         var expectedVersion = 0;
         var expectedName = "";
         var expectedDescription = """
@@ -162,7 +162,7 @@ public class PlanTest {
         // given
         var expectedMessage = "'name' should not be empty";
 
-        var expectedId = new PlanId("123");
+        var expectedId = new PlanId(123L);
         var expectedVersion = 0;
         String expectedName = null;
         var expectedDescription = """
@@ -190,7 +190,7 @@ public class PlanTest {
         // given
         var expectedMessage = "'description' should not be empty";
 
-        var expectedId = new PlanId("123");
+        var expectedId = new PlanId(123L);
         var expectedVersion = 0;
         var expectedName = "Plus";
         var expectedDescription = "";
@@ -216,7 +216,7 @@ public class PlanTest {
         // given
         var expectedMessage = "'description' should not be empty";
 
-        var expectedId = new PlanId("123");
+        var expectedId = new PlanId(123L);
         var expectedVersion = 0;
         var expectedName = "Plus";
         String expectedDescription = null;
@@ -242,7 +242,7 @@ public class PlanTest {
         // given
         var expectedMessage = "'active' should not be null";
 
-        var expectedId = new PlanId("123");
+        var expectedId = new PlanId(123L);
         var expectedVersion = 0;
         var expectedName = "Plus";
         var expectedDescription = """
@@ -270,7 +270,7 @@ public class PlanTest {
         // given
         var expectedMessage = "'price' should not be null";
 
-        var expectedId = new PlanId("123");
+        var expectedId = new PlanId(123L);
         var expectedVersion = 0;
         var expectedName = "Plus";
         var expectedDescription = "description";
@@ -294,7 +294,7 @@ public class PlanTest {
     @Test
     public void given0AsPrice_whenCallsWith_ShouldReturnOK() {
         // given
-        var expectedId = new PlanId("123");
+        var expectedId = new PlanId(123L);
         var expectedVersion = 0;
         var expectedName = "Plus";
         var expectedDescription = """
@@ -328,7 +328,7 @@ public class PlanTest {
         // given
         var expectedMessage = "'createdAt' should not be null";
 
-        var expectedId = new PlanId("123");
+        var expectedId = new PlanId(123L);
         var expectedVersion = 0;
         var expectedName = "Plus";
         var expectedDescription = """
@@ -355,7 +355,7 @@ public class PlanTest {
         // given
         var expectedMessage = "'updatedAt' should not be null";
 
-        var expectedId = new PlanId("123");
+        var expectedId = new PlanId(123L);
         var expectedVersion = 0;
         var expectedName = "Plus";
         var expectedDescription = """
@@ -380,7 +380,7 @@ public class PlanTest {
     @Test
     public void givenNullDeletedAt_whenCallsWith_ShouldReturnOK() {
         // given
-        var expectedId = new PlanId("123");
+        var expectedId = new PlanId(123L);
         var expectedVersion = 0;
         var expectedName = "Plus";
         var expectedDescription = """
@@ -411,7 +411,7 @@ public class PlanTest {
     @Test
     public void givenPlan_whenExecuteWithoutCommands_ShouldDoNothing() {
         // given
-        var expectedId = new PlanId("PLN-123");
+        var expectedId = new PlanId(123L);
         var expectedVersion = 1;
         var expectedName = "Plus";
         var expectedDescription = """
@@ -440,7 +440,7 @@ public class PlanTest {
     @Test
     public void givenInactivePlan_whenExecuteActiveCommand_ShouldActivate() throws InterruptedException {
         // given
-        var expectedId = new PlanId("PLN-123");
+        var expectedId = new PlanId(123L);
         var expectedVersion = 1;
         var expectedName = "Plus";
         var expectedDescription = """
@@ -472,7 +472,7 @@ public class PlanTest {
     @Test
     public void givenActivePlan_whenExecuteInactivateCommand_ShouldInactivate() throws InterruptedException {
         // given
-        var expectedId = new PlanId("PLN-123");
+        var expectedId = new PlanId(123L);
         var expectedVersion = 1;
         var expectedName = "Plus";
         var expectedDescription = """
@@ -504,7 +504,7 @@ public class PlanTest {
     @Test
     public void givenPlan_whenExecuteChangeCommand_ShouldUpdateAttributes() throws InterruptedException {
         // given
-        var expectedId = new PlanId("PLN-123");
+        var expectedId = new PlanId(123L);
         var expectedVersion = 1;
         var expectedName = "Plus";
         var expectedDescription = """
