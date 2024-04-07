@@ -4,12 +4,14 @@ package com.fullcycle.subscription.domain.subscription;
 import com.fullcycle.subscription.domain.Fixture;
 import com.fullcycle.subscription.domain.account.AccountId;
 import com.fullcycle.subscription.domain.plan.PlanId;
+import com.fullcycle.subscription.domain.subscription.status.SubscriptionStatus;
 import com.fullcycle.subscription.domain.utils.InstantUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 /**
@@ -73,12 +75,12 @@ public class SubscriptionTest {
                 expectedVersion,
                 expectedAccountId,
                 expectedPlanId,
-                expectedCreatedAt,
-                expectedUpdatedAt,
-                expectedStatus,
                 expectedDueDate,
+                expectedStatus,
                 expectedLastRenewDate,
-                expectedLastTransactionId
+                expectedLastTransactionId,
+                expectedCreatedAt,
+                expectedUpdatedAt
         );
 
         // then
