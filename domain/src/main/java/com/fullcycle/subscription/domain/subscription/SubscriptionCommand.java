@@ -5,6 +5,8 @@ import com.fullcycle.subscription.domain.plan.Plan;
 
 public sealed interface SubscriptionCommand extends AssertionConcern {
 
+    record CancelSubscription() implements SubscriptionCommand {}
+
     record IncompleteSubscription(String aReason, String aTransactionId) implements SubscriptionCommand {
         public IncompleteSubscription {
             this.assertArgumentNotEmpty(aTransactionId, "'transactionId' should not be empty");

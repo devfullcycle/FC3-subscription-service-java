@@ -196,4 +196,52 @@ public class SubscriptionTest {
         Assertions.assertEquals(expectedEvents, actualSubscription.domainEvents().size());
 //        Assertions.assertInstanceOf(SubscriptionEvent.SubscriptionRenewed.class, actualSubscription.domainEvents().getFirst());
     }
+
+    @Test
+    public void givenTrialingSubscription_whenExecuteCancelCommand_ShouldTransitToCanceledState() {
+        // given
+        var expectedId = new SubscriptionId("SUB123");
+        var expectedVersion = 0;
+        var expectedAccountId = new AccountId("ACC123");
+        var expectedPlanId = new PlanId(123L);
+        var expectedStatus = SubscriptionStatus.CANCELED;
+        var expectedCreatedAt = InstantUtils.now();
+        var expectedUpdatedAt = InstantUtils.now();
+        var expectedDueDate = LocalDate.now().plusMonths(1);
+        var expectedLastRenewDate = InstantUtils.now();
+        var expectedLastTransactionId = UUID.randomUUID().toString();
+        var expectedEvents = 1;
+
+        var actualSubscription = Subscription.with(
+                expectedId,
+                expectedVersion,
+                expectedAccountId,
+                expectedPlanId,
+                expectedDueDate,
+                SubscriptionStatus.TRAILING,
+                expectedLastRenewDate,
+                expectedLastTransactionId,
+                expectedCreatedAt,
+                expectedUpdatedAt
+        );
+
+        // when
+        actualSubscription.execute(new SubscriptionCommand.CancelSubscription());
+
+        // then
+        Assertions.assertNotNull(actualSubscription);
+        Assertions.assertEquals(expectedId, actualSubscription.id());
+        Assertions.assertEquals(expectedVersion, actualSubscription.version());
+        Assertions.assertEquals(expectedAccountId, actualSubscription.accountId());
+        Assertions.assertEquals(expectedPlanId, actualSubscription.planId());
+        Assertions.assertEquals(expectedDueDate, actualSubscription.dueDate());
+        Assertions.assertEquals(expectedStatus, actualSubscription.status().value());
+        Assertions.assertNotNull(actualSubscription.lastRenewDate());
+        Assertions.assertEquals(expectedLastTransactionId, actualSubscription.lastTransactionId());
+        Assertions.assertEquals(expectedCreatedAt, actualSubscription.createdAt());
+        Assertions.assertTrue(actualSubscription.updatedAt().isAfter(expectedUpdatedAt));
+
+        Assertions.assertEquals(expectedEvents, actualSubscription.domainEvents().size());
+//        Assertions.assertInstanceOf(SubscriptionEvent.SubscriptionCanceled.class, actualSubscription.domainEvents().getFirst());
+    }
 }

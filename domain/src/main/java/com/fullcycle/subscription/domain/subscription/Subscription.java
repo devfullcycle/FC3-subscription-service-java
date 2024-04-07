@@ -4,6 +4,7 @@ import com.fullcycle.subscription.domain.AggregateRoot;
 import com.fullcycle.subscription.domain.account.AccountId;
 import com.fullcycle.subscription.domain.plan.Plan;
 import com.fullcycle.subscription.domain.plan.PlanId;
+import com.fullcycle.subscription.domain.subscription.SubscriptionCommand.CancelSubscription;
 import com.fullcycle.subscription.domain.subscription.SubscriptionCommand.ChangeStatus;
 import com.fullcycle.subscription.domain.subscription.SubscriptionCommand.IncompleteSubscription;
 import com.fullcycle.subscription.domain.subscription.SubscriptionCommand.RenewSubscription;
@@ -89,6 +90,7 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
 
         for (var cmd : cmds) {
             switch (cmd) {
+                case CancelSubscription c -> apply(c);
                 case ChangeStatus c -> apply(c);
                 case IncompleteSubscription c -> apply(c);
                 case RenewSubscription c -> apply(c);
@@ -146,6 +148,11 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
         this.setDueDate(dueDate.plusMonths(1));
         this.setLastRenewDate(InstantUtils.now());
         // TODO: Emit SubscriptionRenewed event
+    }
+
+    private void apply(final CancelSubscription cmd) {
+        this.status.cancel();
+        // TODO: Emit SubscriptionCanceled event
     }
 
     private void apply(final ChangeStatus cmd) {
