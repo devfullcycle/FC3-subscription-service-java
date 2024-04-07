@@ -19,12 +19,12 @@ public final class ActiveSubscriptionStatus extends AbstractSubscriptionStatus {
 
     @Override
     public void incomplete() {
-        this.subscription.execute(new ChangeStatus(new IncompleteSubscriptionStatus(this.subscription)));
+        this.subscription.execute(new ChangeStatus(INCOMPLETE));
     }
 
     @Override
     public void cancel() {
-        this.subscription.execute(new ChangeStatus(new CanceledSubscriptionStatus(this.subscription)));
+        this.subscription.execute(new ChangeStatus(CANCELED));
     }
 
     @Override

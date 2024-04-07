@@ -12,17 +12,17 @@ public record TrailingSubscriptionStatus(Subscription subscription) implements S
 
     @Override
     public void incomplete() {
-        this.subscription.execute(new ChangeStatus(new IncompleteSubscriptionStatus(this.subscription)));
+        this.subscription.execute(new ChangeStatus(INCOMPLETE));
     }
 
     @Override
     public void active() {
-        this.subscription.execute(new ChangeStatus(new ActiveSubscriptionStatus(this.subscription)));
+        this.subscription.execute(new ChangeStatus(ACTIVE));
     }
 
     @Override
     public void cancel() {
-        this.subscription.execute(new ChangeStatus(new CanceledSubscriptionStatus(this.subscription)));
+        this.subscription.execute(new ChangeStatus(CANCELED));
     }
 
     @Override

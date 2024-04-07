@@ -5,6 +5,7 @@ import com.fullcycle.subscription.domain.account.AccountId;
 import com.fullcycle.subscription.domain.plan.Plan;
 import com.fullcycle.subscription.domain.plan.PlanId;
 import com.fullcycle.subscription.domain.subscription.SubscriptionCommand.ChangeStatus;
+import com.fullcycle.subscription.domain.subscription.SubscriptionCommand.IncompleteSubscription;
 import com.fullcycle.subscription.domain.subscription.status.SubscriptionStatus;
 import com.fullcycle.subscription.domain.utils.InstantUtils;
 
@@ -51,6 +52,7 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
     public static Subscription newSubscription(final SubscriptionId anId, final AccountId anAccountId, final Plan selectedPlan) {
         final var now = InstantUtils.now();
         return new Subscription(anId, 0, anAccountId, selectedPlan.id(), LocalDate.now().plusMonths(1), SubscriptionStatus.TRAILING, null, null, now, now);
+        // TODO: Emit SubscriptionCreated event
     }
 
     public static Subscription with(
@@ -86,6 +88,7 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
 
         for (var cmd : cmds) {
             switch (cmd) {
+                case IncompleteSubscription c -> apply(c);
                 case ChangeStatus c -> apply(c);
             }
         }
@@ -129,8 +132,14 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
         return updatedAt;
     }
 
+    private void apply(final IncompleteSubscription cmd) {
+        this.status.incomplete();
+        this.setLastTransactionId(cmd.aTransactionId());
+        // TODO: Emit SubscriptionIncomplete event
+    }
+
     private void apply(final ChangeStatus cmd) {
-        this.setStatus(cmd.status());
+        this.setStatus(SubscriptionStatus.create(cmd.status(), this));
     }
 
     private void setVersion(int version) {

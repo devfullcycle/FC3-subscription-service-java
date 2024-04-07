@@ -18,12 +18,12 @@ public record IncompleteSubscriptionStatus(Subscription subscription) implements
 
     @Override
     public void active() {
-        this.subscription.execute(new ChangeStatus(new ActiveSubscriptionStatus(this.subscription)));
+        this.subscription.execute(new ChangeStatus(ACTIVE));
     }
 
     @Override
     public void cancel() {
-        this.subscription.execute(new ChangeStatus(new CanceledSubscriptionStatus(this.subscription)));
+        this.subscription.execute(new ChangeStatus(CANCELED));
     }
 
     @Override

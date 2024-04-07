@@ -32,7 +32,7 @@ public class SubscriptionTest {
         var expectedDueDate = LocalDate.now().plusMonths(1);
         Instant expectedLastRenewDate = null;
         String expectedLastTransactionId = null;
-//        var expectedEvents = 1;
+        var expectedEvents = 1;
 
         // when
         var actualSubscription =
@@ -51,7 +51,7 @@ public class SubscriptionTest {
         Assertions.assertNotNull(actualSubscription.createdAt());
         Assertions.assertNotNull(actualSubscription.updatedAt());
 
-//        Assertions.assertEquals(expectedEvents, actualSubscription.domainEvents().size());
+        Assertions.assertEquals(expectedEvents, actualSubscription.domainEvents().size());
 //        Assertions.assertInstanceOf(SubscriptionEvent.SubscriptionCreated.class, actualSubscription.domainEvents().getFirst());
     }
 
@@ -97,5 +97,54 @@ public class SubscriptionTest {
         Assertions.assertEquals(expectedUpdatedAt, actualSubscription.updatedAt());
 
         Assertions.assertTrue(actualSubscription.domainEvents().isEmpty());
+    }
+
+    @Test
+    public void givenTrialingSubscription_whenExecuteIncompleteCommand_ShouldTransitToIncompleteState() {
+        // given
+        var expectedId = new SubscriptionId("SUB123");
+        var expectedVersion = 0;
+        var expectedAccountId = new AccountId("ACC123");
+        var expectedPlanId = new PlanId(123L);
+        var expectedStatus = SubscriptionStatus.INCOMPLETE;
+        var expectedCreatedAt = InstantUtils.now();
+        var expectedUpdatedAt = InstantUtils.now();
+        var expectedDueDate = LocalDate.now();
+        Instant expectedLastRenewDate = null;
+        var expectedLastTransactionId = UUID.randomUUID().toString();
+        var expectedReason = "Fail to charge creditcard";
+        var expectedEvents = 1;
+
+        var actualSubscription = Subscription.with(
+                expectedId,
+                expectedVersion,
+                expectedAccountId,
+                expectedPlanId,
+                expectedDueDate,
+                SubscriptionStatus.TRAILING,
+                expectedLastRenewDate,
+                null,
+                expectedCreatedAt,
+                expectedUpdatedAt
+        );
+
+        // when
+        actualSubscription.execute(new SubscriptionCommand.IncompleteSubscription(expectedReason, expectedLastTransactionId));
+
+        // then
+        Assertions.assertNotNull(actualSubscription);
+        Assertions.assertEquals(expectedId, actualSubscription.id());
+        Assertions.assertEquals(expectedVersion, actualSubscription.version());
+        Assertions.assertEquals(expectedAccountId, actualSubscription.accountId());
+        Assertions.assertEquals(expectedPlanId, actualSubscription.planId());
+        Assertions.assertEquals(expectedDueDate, actualSubscription.dueDate());
+        Assertions.assertEquals(expectedStatus, actualSubscription.status().value());
+        Assertions.assertEquals(expectedLastRenewDate, actualSubscription.lastRenewDate());
+        Assertions.assertEquals(expectedLastTransactionId, actualSubscription.lastTransactionId());
+        Assertions.assertEquals(expectedCreatedAt, actualSubscription.createdAt());
+        Assertions.assertTrue(actualSubscription.updatedAt().isAfter(expectedUpdatedAt));
+
+        Assertions.assertEquals(expectedEvents, actualSubscription.domainEvents().size());
+//        Assertions.assertInstanceOf(SubscriptionEvent.SubscriptionIncomplete.class, actualSubscription.domainEvents().getFirst());
     }
 }
