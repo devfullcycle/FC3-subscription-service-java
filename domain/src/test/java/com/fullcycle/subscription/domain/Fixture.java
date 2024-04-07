@@ -15,7 +15,7 @@ public final class Fixture {
             return Plan.newPlan(
                     new PlanId(123L),
                     "Plus",
-                    FAKER.text().text(100, 1000),
+                    FAKER.text().text(100, 500),
                     true,
                     new Money("BRL", 20D)
             );

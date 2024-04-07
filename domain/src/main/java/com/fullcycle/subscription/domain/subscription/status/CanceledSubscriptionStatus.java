@@ -24,4 +24,19 @@ public record CanceledSubscriptionStatus(Subscription subscription) implements S
     public void cancel() {
         // do nothing
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj != null && obj.getClass().equals(getClass());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return value();
+    }
 }

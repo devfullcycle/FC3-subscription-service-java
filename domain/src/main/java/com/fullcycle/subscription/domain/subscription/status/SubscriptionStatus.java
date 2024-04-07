@@ -29,6 +29,14 @@ public sealed interface SubscriptionStatus permits
     }
 
     static SubscriptionStatus create(final String status, final Subscription aSubscription) {
+        if (aSubscription == null) {
+            throw DomainException.with("'subscription' should not be null");
+        }
+
+        if (status == null) {
+            throw DomainException.with("'status' should not be null");
+        }
+
         return switch (status) {
             case ACTIVE -> new ActiveSubscriptionStatus(aSubscription);
             case CANCELED -> new CanceledSubscriptionStatus(aSubscription);

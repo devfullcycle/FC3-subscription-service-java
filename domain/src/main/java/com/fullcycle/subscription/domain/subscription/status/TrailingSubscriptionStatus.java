@@ -24,4 +24,19 @@ public record TrailingSubscriptionStatus(Subscription subscription) implements S
     public void cancel() {
         this.subscription.execute(new ChangeStatus(new CanceledSubscriptionStatus(this.subscription)));
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj != null && obj.getClass().equals(getClass());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return value();
+    }
 }

@@ -8,7 +8,7 @@ public record IncompleteSubscriptionStatus(Subscription subscription) implements
 
     @Override
     public void trailing() {
-        throw DomainException.with("Subscription with status canceled can´t transit to trailing");
+        throw DomainException.with("Subscription with status incomplete can´t transit to trailing");
     }
 
     @Override
@@ -24,5 +24,20 @@ public record IncompleteSubscriptionStatus(Subscription subscription) implements
     @Override
     public void cancel() {
         this.subscription.execute(new ChangeStatus(new CanceledSubscriptionStatus(this.subscription)));
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj != null && obj.getClass().equals(getClass());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return value();
     }
 }

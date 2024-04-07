@@ -146,7 +146,7 @@ public class Plan extends AggregateRoot<PlanId> {
 
     private void setDescription(final String description) {
         this.assertArgumentNotEmpty(description, "'description' should not be empty");
-        this.assertArgumentMaxLength(description, 500, "'description' should have more than 500 characters");
+        this.assertArgumentMaxLength(description, 500, "'description' should not have more than 500 characters");
         this.description = description;
     }
 
