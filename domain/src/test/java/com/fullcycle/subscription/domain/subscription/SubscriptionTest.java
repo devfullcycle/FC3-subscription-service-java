@@ -52,7 +52,7 @@ public class SubscriptionTest {
         Assertions.assertNotNull(actualSubscription.updatedAt());
 
         Assertions.assertEquals(expectedEvents, actualSubscription.domainEvents().size());
-//        Assertions.assertInstanceOf(SubscriptionEvent.SubscriptionCreated.class, actualSubscription.domainEvents().getFirst());
+        Assertions.assertInstanceOf(SubscriptionCreated.class, actualSubscription.domainEvents().getFirst());
     }
 
     @Test
@@ -145,7 +145,7 @@ public class SubscriptionTest {
         Assertions.assertTrue(actualSubscription.updatedAt().isAfter(expectedUpdatedAt));
 
         Assertions.assertEquals(expectedEvents, actualSubscription.domainEvents().size());
-//        Assertions.assertInstanceOf(SubscriptionEvent.SubscriptionIncomplete.class, actualSubscription.domainEvents().getFirst());
+        Assertions.assertInstanceOf(SubscriptionIncomplete.class, actualSubscription.domainEvents().getFirst());
     }
 
     @Test
@@ -194,7 +194,7 @@ public class SubscriptionTest {
         Assertions.assertTrue(actualSubscription.updatedAt().isAfter(expectedUpdatedAt));
 
         Assertions.assertEquals(expectedEvents, actualSubscription.domainEvents().size());
-//        Assertions.assertInstanceOf(SubscriptionEvent.SubscriptionRenewed.class, actualSubscription.domainEvents().getFirst());
+        Assertions.assertInstanceOf(SubscriptionRenewed.class, actualSubscription.domainEvents().getFirst());
     }
 
     @Test
@@ -242,6 +242,6 @@ public class SubscriptionTest {
         Assertions.assertTrue(actualSubscription.updatedAt().isAfter(expectedUpdatedAt));
 
         Assertions.assertEquals(expectedEvents, actualSubscription.domainEvents().size());
-//        Assertions.assertInstanceOf(SubscriptionEvent.SubscriptionCanceled.class, actualSubscription.domainEvents().getFirst());
+        Assertions.assertInstanceOf(SubscriptionCanceled.class, actualSubscription.domainEvents().getFirst());
     }
 }
