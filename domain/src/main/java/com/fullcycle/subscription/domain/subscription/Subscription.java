@@ -4,6 +4,7 @@ import com.fullcycle.subscription.domain.AggregateRoot;
 import com.fullcycle.subscription.domain.account.AccountId;
 import com.fullcycle.subscription.domain.plan.Plan;
 import com.fullcycle.subscription.domain.plan.PlanId;
+import com.fullcycle.subscription.domain.subscription.SubscriptionCommand.ChangeStatus;
 import com.fullcycle.subscription.domain.subscription.status.SubscriptionStatus;
 import com.fullcycle.subscription.domain.utils.InstantUtils;
 
@@ -78,6 +79,20 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
         );
     }
 
+    public void execute(final SubscriptionCommand... cmds) {
+        if (cmds == null || cmds.length == 0) {
+            return;
+        }
+
+        for (var cmd : cmds) {
+            switch (cmd) {
+                case ChangeStatus c -> apply(c);
+            }
+        }
+
+        this.setUpdatedAt(InstantUtils.now());
+    }
+
     public int version() {
         return version;
     }
@@ -112,6 +127,10 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
 
     public Instant updatedAt() {
         return updatedAt;
+    }
+
+    private void apply(final ChangeStatus cmd) {
+        this.setStatus(cmd.status());
     }
 
     private void setVersion(int version) {
