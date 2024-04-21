@@ -3,7 +3,7 @@ package com.fullcycle.subscription.domain.payment;
 public record Transaction(String transactionId, String errorMessage) {
 
     public boolean isSuccess() {
-        return errorMessage != null;
+        return errorMessage == null;
     }
 
     public static Transaction success(String transactionId) {

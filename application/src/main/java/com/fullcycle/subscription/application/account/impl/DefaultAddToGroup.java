@@ -42,21 +42,17 @@ public class DefaultAddToGroup extends AddToGroup {
 
         final var aSubscription = subscriptionGateway.subscriptionOfId(aSubscriptionId)
                 .filter(it -> it.accountId().equals(anAccountId))
-                .orElseThrow(() -> notFound(Subscription.class, aSubscriptionId));
+                .orElseThrow(() -> DomainException.notFound(Subscription.class, aSubscriptionId));
 
         if (aSubscription.isTrail() || aSubscription.isActive()) {
             final var userId = this.accountGateway.accountOfId(anAccountId)
-                    .orElseThrow(() -> notFound(Account.class, anAccountId))
+                    .orElseThrow(() -> DomainException.notFound(Account.class, anAccountId))
                     .userId();
 
             this.identityProviderGateway.addUserToGroup(userId, new GroupId(in.groupId()));
         }
 
         return new StdOutput(aSubscriptionId);
-    }
-
-    private RuntimeException notFound(Class<? extends AggregateRoot<?>> aggClass, Identifier id) {
-        return DomainException.with("%s with id %s was not found".formatted(aggClass.getCanonicalName(), id.value()));
     }
 
     record StdOutput(SubscriptionId subscriptionId) implements Output {
