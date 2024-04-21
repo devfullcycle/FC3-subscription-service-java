@@ -8,9 +8,7 @@ import com.fullcycle.subscription.domain.subscription.SubscriptionCommand.Cancel
 import com.fullcycle.subscription.domain.subscription.SubscriptionCommand.ChangeStatus;
 import com.fullcycle.subscription.domain.subscription.SubscriptionCommand.IncompleteSubscription;
 import com.fullcycle.subscription.domain.subscription.SubscriptionCommand.RenewSubscription;
-import com.fullcycle.subscription.domain.subscription.status.ActiveSubscriptionStatus;
-import com.fullcycle.subscription.domain.subscription.status.SubscriptionStatus;
-import com.fullcycle.subscription.domain.subscription.status.TrailingSubscriptionStatus;
+import com.fullcycle.subscription.domain.subscription.status.*;
 import com.fullcycle.subscription.domain.utils.InstantUtils;
 
 import java.time.Instant;
@@ -210,5 +208,13 @@ public class Subscription extends AggregateRoot<SubscriptionId> {
 
     public boolean isActive() {
         return this.status instanceof ActiveSubscriptionStatus;
+    }
+
+    public boolean isCanceled() {
+        return this.status instanceof CanceledSubscriptionStatus;
+    }
+
+    public boolean isIncomplete() {
+        return this.status instanceof IncompleteSubscriptionStatus;
     }
 }
