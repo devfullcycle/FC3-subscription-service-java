@@ -1,4 +1,4 @@
-package com.fullcycle.subscription.domain.account.iam;
+package com.fullcycle.subscription.domain.account.idp;
 
 import com.fullcycle.subscription.domain.exceptions.DomainException;
 import org.junit.jupiter.api.Test;
