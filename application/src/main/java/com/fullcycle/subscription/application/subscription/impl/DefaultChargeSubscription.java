@@ -17,10 +17,7 @@ import com.fullcycle.subscription.domain.subscription.SubscriptionGateway;
 import com.fullcycle.subscription.domain.subscription.SubscriptionId;
 import com.fullcycle.subscription.domain.utils.IdUtils;
 
-import java.time.Clock;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
@@ -88,7 +85,7 @@ public class DefaultChargeSubscription extends ChargeSubscription {
     }
 
     private boolean hasTolerableDays(final LocalDate dueDate, final Instant now) {
-        return ChronoUnit.DAYS.between(dueDate, now) <= MAX_INCOMPLETE_DAYS;
+        return ChronoUnit.DAYS.between(dueDate, LocalDate.ofInstant(now, ZoneOffset.UTC)) <= MAX_INCOMPLETE_DAYS;
     }
 
     private Payment newPaymentWith(final Input in, final Plan aPlan, final Account anUserAccount) {
