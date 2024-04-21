@@ -198,7 +198,7 @@ public class SubscriptionTest {
     }
 
     @Test
-    public void givenTrialingSubscription_whenExecuteCancelCommand_ShouldTransitToCanceledState() {
+    public void givenTrialingSubscription_whenExecuteCancelCommand_ShouldTransitToCanceledState() throws InterruptedException {
         // given
         var expectedId = new SubscriptionId("SUB123");
         var expectedVersion = 0;
@@ -226,6 +226,8 @@ public class SubscriptionTest {
         );
 
         // when
+        Thread.sleep(1);
+
         actualSubscription.execute(new SubscriptionCommand.CancelSubscription());
 
         // then
