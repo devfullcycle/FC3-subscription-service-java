@@ -90,6 +90,7 @@ public class Plan extends AggregateRoot<PlanId> {
     private void apply(final PlanCommand.ChangePlan cmd) {
         this.setName(cmd.name());
         this.setDescription(cmd.description());
+        this.setPrice(cmd.price());
         if (Boolean.TRUE.equals(cmd.active())) {
             apply(new PlanCommand.ActivatePlan());
         } else {

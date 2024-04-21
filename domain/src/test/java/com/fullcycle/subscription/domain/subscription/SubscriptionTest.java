@@ -227,6 +227,7 @@ public class SubscriptionTest {
 
         // when
         Thread.sleep(1);
+
         actualSubscription.execute(new SubscriptionCommand.CancelSubscription());
 
         // then
