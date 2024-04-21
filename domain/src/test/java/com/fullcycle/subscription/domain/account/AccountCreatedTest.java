@@ -1,6 +1,6 @@
 package com.fullcycle.subscription.domain.account;
 
-import com.fullcycle.subscription.domain.account.iam.UserId;
+import com.fullcycle.subscription.domain.account.idp.UserId;
 import com.fullcycle.subscription.domain.exceptions.DomainException;
 import com.fullcycle.subscription.domain.person.Document;
 import com.fullcycle.subscription.domain.person.Email;
