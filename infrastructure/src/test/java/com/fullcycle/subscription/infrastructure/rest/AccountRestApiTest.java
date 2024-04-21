@@ -96,7 +96,7 @@ public class AccountRestApiTest {
         var expectedDocumentNumber = "12312312323";
         var expectedPassword = "12312312323";
         var expectedErrorProperty = "firstname";
-        var expectedErrorMessage = "'firstname' must not be empty";
+        var expectedErrorMessage = "must not be blank";
 
         var json = """
                 {
