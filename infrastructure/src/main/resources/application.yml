@@ -1,3 +1,7 @@
+logging:
+  level:
+    org.springframework.security: DEBUG
+
 keycloak:
   token-uri: /protocol/openid-connect/token
 
