@@ -106,7 +106,7 @@ public class SignUpRequest implements CreateIdpUser.Input, CreateAccount.Input {
         return userId;
     }
 
-    public SignUpRequest withUserId(CreateIdpUser.Output out) {
+    public SignUpRequest with(final CreateIdpUser.Output out) {
         return new SignUpRequest(
                 documentNumber(),
                 documentType(),
