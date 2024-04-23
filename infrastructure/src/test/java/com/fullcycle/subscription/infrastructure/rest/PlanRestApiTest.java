@@ -6,6 +6,7 @@ import com.fullcycle.subscription.application.plan.ChangePlan;
 import com.fullcycle.subscription.application.plan.CreatePlan;
 import com.fullcycle.subscription.domain.plan.PlanId;
 import com.fullcycle.subscription.infrastructure.rest.controllers.PlanRestController;
+import com.fullcycle.subscription.infrastructure.rest.models.res.ChangePlanResponse;
 import com.fullcycle.subscription.infrastructure.rest.models.res.CreatePlanResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ControllerTest(controllers = PlanRestController.class)
@@ -39,6 +41,9 @@ public class PlanRestApiTest {
     @Captor
     private ArgumentCaptor<CreatePlan.Input> createPlanInputCaptor;
 
+    @Captor
+    private ArgumentCaptor<ChangePlan.Input> changePlanInputCaptor;
+
     @Test
     public void givenValidInput_whenCreateSuccessfully_shouldReturnPlanId() throws Exception {
         // given
@@ -51,7 +56,7 @@ public class PlanRestApiTest {
 
         when(createPlan.execute(any(), any())).thenAnswer(call -> {
             Presenter<CreatePlan.Output, CreatePlanResponse> p = call.getArgument(1);
-            return p.apply(new CreatePlanTestOutput(expectedPlanId));
+            return p.apply(new PlanTestOutput(expectedPlanId));
         });
 
         var json = """
@@ -132,5 +137,60 @@ public class PlanRestApiTest {
         verify(createPlan, times(0)).execute(any(), any());
     }
 
-    record CreatePlanTestOutput(PlanId planId) implements CreatePlan.Output {}
+    @Test
+    public void givenValidInput_whenChangeSuccessfully_shouldReturnPlanId() throws Exception {
+        // given
+        var expectedId = 123L;
+        var expectedName = "Plus";
+        var expectedDescription = "O melhor plano";
+        var expectedPrice = 20D;
+        var expectedCurrency = "BRL";
+        var expectedActive = true;
+        var expectedPlanId = new PlanId(123L);
+
+        when(changePlan.execute(any(), any())).thenAnswer(call -> {
+            Presenter<ChangePlan.Output, ChangePlanResponse> p = call.getArgument(1);
+            return p.apply(new PlanTestOutput(expectedPlanId));
+        });
+
+        var json = """
+                {
+                    "plan_id": %s,
+                    "name": "%s",
+                    "description": "%s",
+                    "price": %s,
+                    "currency": "%s",
+                    "active": %s
+                }
+                """.formatted(expectedId, expectedName, expectedDescription, expectedPrice, expectedCurrency, expectedActive);
+
+        // when
+        var aRequest = put("/plans/{id}", expectedId)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(json)
+                .with(admin());
+
+        var aResponse = this.mvc.perform(aRequest);
+
+        // then
+        aResponse
+                .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.plan_id").value(equalTo(expectedPlanId.value()), Long.class));
+
+        verify(changePlan, times(1)).execute(changePlanInputCaptor.capture(), any());
+
+        var actualRequest = changePlanInputCaptor.getValue();
+
+        Assertions.assertEquals(expectedId, actualRequest.planId());
+        Assertions.assertEquals(expectedName, actualRequest.name());
+        Assertions.assertEquals(expectedDescription, actualRequest.description());
+        Assertions.assertEquals(expectedPrice, actualRequest.price());
+        Assertions.assertEquals(expectedCurrency, actualRequest.currency());
+        Assertions.assertEquals(expectedActive, actualRequest.active());
+    }
+
+    record PlanTestOutput(PlanId planId) implements CreatePlan.Output, ChangePlan.Output {}
+
 }
