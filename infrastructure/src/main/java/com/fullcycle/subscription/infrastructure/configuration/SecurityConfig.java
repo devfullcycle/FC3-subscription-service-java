@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 @Profile("!development")
 public class SecurityConfig {
 
-    private static final String ROLE_ADMIN = "CATALOGO_ADMIN";
+    private static final String ROLE_ADMIN = "SUBSCRIPTION_ADMIN";
 
     @Bean
     public SecurityFilterChain securityFilterChain(final HttpSecurity http) throws Exception {
