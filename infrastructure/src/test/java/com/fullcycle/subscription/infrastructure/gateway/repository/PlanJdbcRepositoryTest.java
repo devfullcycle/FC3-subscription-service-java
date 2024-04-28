@@ -51,6 +51,39 @@ class PlanJdbcRepositoryTest extends AbstractRepositoryTest {
     }
 
     @Test
+    @Sql({"classpath:/sql/plans/seed-plans.sql"})
+    public void givenPersistedPlans_whenQueriesSuccessfully_shouldReturnIt() {
+        // given
+        Assertions.assertEquals(2, countPlans());
+
+        // when
+        var actualPlans = this.planRepository().allPlans();
+
+        // then
+        var planFree = actualPlans.getFirst();
+        assertEquals(new PlanId(1L), planFree.id());
+        assertEquals(5, planFree.version());
+        assertEquals("Free", planFree.name());
+        assertEquals("Grátis para projetos pessoais", planFree.description());
+        assertTrue(planFree.active());
+        assertEquals(new Money("BRL", 0D), planFree.price());
+        assertEquals(Instant.parse("2024-04-28T10:57:11.111Z"), planFree.createdAt());
+        assertEquals(Instant.parse("2024-04-28T10:58:11.111Z"), planFree.updatedAt());
+        assertNull(planFree.deletedAt());
+
+        var planPlus = actualPlans.getLast();
+        assertEquals(new PlanId(2L), planPlus.id());
+        assertEquals(3, planPlus.version());
+        assertEquals("Plus", planPlus.name());
+        assertEquals("O plano top", planPlus.description());
+        assertFalse(planPlus.active());
+        assertEquals(new Money("BRL", 20D), planPlus.price());
+        assertEquals(Instant.parse("2024-04-28T10:57:11.111Z"), planPlus.createdAt());
+        assertEquals(Instant.parse("2024-04-28T10:58:11.111Z"), planPlus.updatedAt());
+        assertEquals(Instant.parse("2024-04-28T10:59:11.111Z"), planPlus.deletedAt());
+    }
+
+    @Test
     public void givenEmptyTable_whenInsertSuccessfully_shouldBePersisted() {
         // given
         Assertions.assertEquals(0, countPlans());
