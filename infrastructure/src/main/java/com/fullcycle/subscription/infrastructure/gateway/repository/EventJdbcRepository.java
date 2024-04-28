@@ -2,10 +2,9 @@ package com.fullcycle.subscription.infrastructure.gateway.repository;
 
 import com.fullcycle.subscription.domain.DomainEvent;
 import com.fullcycle.subscription.domain.utils.InstantUtils;
+import com.fullcycle.subscription.infrastructure.jdbc.DatabaseClient;
+import com.fullcycle.subscription.infrastructure.jdbc.RowMap;
 import com.fullcycle.subscription.infrastructure.json.Json;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
@@ -14,16 +13,16 @@ import java.util.*;
 @Repository
 public class EventJdbcRepository {
 
-    private final JdbcClient jdbcClient;
+    private final DatabaseClient database;
 
-    public EventJdbcRepository(final JdbcClient jdbcClient) {
-        this.jdbcClient = Objects.requireNonNull(jdbcClient);
+    public EventJdbcRepository(final DatabaseClient databaseClient) {
+        this.database = Objects.requireNonNull(databaseClient);
     }
 
     public List<DomainEvent> allEventsOfAggregate(final String aggregateId, final String aggregateType) {
         final var sql = "SELECT event_id, processed, aggregate_id, aggregate_type, event_type, event_date, event_data FROM events WHERE aggregate_id = :aggregateId and aggregate_type = :aggregateType";
-        final var params = Map.of("aggregateId", aggregateId, "aggregateType", aggregateType);
-        return this.jdbcClient.sql(sql).params(params).query(eventMapper()).stream()
+        final var params = Map.<String, Object>of("aggregateId", aggregateId, "aggregateType", aggregateType);
+        return this.database.query(sql, params, eventMapper()).stream()
                 .map(this::toDomainEvent)
                 .toList();
     }
@@ -45,11 +44,7 @@ public class EventJdbcRepository {
         params.put("eventDate", event.eventDate());
         params.put("eventData", event.eventData());
 
-        try {
-            this.jdbcClient.sql(sql).params(params).update();
-        } catch (DataIntegrityViolationException ex) {
-            throw ex;
-        }
+        this.database.update(sql, params);
     }
 
     private DomainEvent toDomainEvent(final Event event) {
@@ -60,8 +55,8 @@ public class EventJdbcRepository {
         }
     }
 
-    private RowMapper<Event> eventMapper() {
-        return (rs, num) -> new Event(
+    private RowMap<Event> eventMapper() {
+        return (rs) -> new Event(
                 rs.getLong("event_id"),
                 rs.getBoolean("processed"),
                 rs.getString("aggregate_id"),
