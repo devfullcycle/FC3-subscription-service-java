@@ -5,7 +5,6 @@ import com.fullcycle.subscription.domain.subscription.Subscription;
 import com.fullcycle.subscription.domain.subscription.SubscriptionGateway;
 import com.fullcycle.subscription.domain.subscription.SubscriptionId;
 import com.fullcycle.subscription.domain.utils.IdUtils;
-import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -13,7 +12,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Component
 public class SubscriptionInMemoryRepository implements SubscriptionGateway {
 
     private final Map<String, Subscription> db = new ConcurrentHashMap<>();

@@ -13,6 +13,8 @@ CREATE TABLE accounts (
     address_country VARCHAR(255)
 );
 
+CREATE INDEX idx_accounts_idp_user_id ON accounts (idp_user_id);
+
 CREATE TABLE events (
     event_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     processed BOOLEAN NOT NULL DEFAULT FALSE,
@@ -37,3 +39,19 @@ CREATE TABLE plans (
     updated_at TIMESTAMP(6) NOT NULL,
     deleted_at TIMESTAMP(6)
 );
+
+CREATE TABLE subscriptions (
+    id CHAR(32) NOT NULL PRIMARY KEY,
+    version SMALLINT NOT NULL DEFAULT 0,
+    account_id CHAR(32) NOT NULL,
+    plan_id INT NOT NULL,
+    status VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP(6) NOT NULL,
+    updated_at TIMESTAMP(6) NOT NULL,
+    due_date DATE NOT NULL,
+    last_renew_dt TIMESTAMP(6),
+    last_transaction_id VARCHAR(32)
+);
+
+CREATE INDEX idx_subscriptions_account_id ON subscriptions (account_id);
+CREATE INDEX idx_subscriptions_due_date ON subscriptions (due_date);
