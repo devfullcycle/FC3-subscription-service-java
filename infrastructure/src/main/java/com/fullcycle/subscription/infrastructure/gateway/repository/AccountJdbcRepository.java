@@ -48,8 +48,14 @@ public class AccountJdbcRepository implements AccountGateway {
     }
 
     @Override
-    public Optional<Account> accountOfUserId(UserId userId) {
-        return Optional.empty();
+    public Optional<Account> accountOfUserId(final UserId userId) {
+        final var sql = """
+                SELECT
+                    id, version, idp_user_id, email, firstname, lastname, document_number, document_type, address_zip_code, address_number, address_complement, address_country
+                FROM accounts
+                WHERE idp_user_id = :userId
+                """;
+        return this.database.queryOne(sql, Map.of("userId", userId.value()), accountMapper());
     }
 
     @Override
