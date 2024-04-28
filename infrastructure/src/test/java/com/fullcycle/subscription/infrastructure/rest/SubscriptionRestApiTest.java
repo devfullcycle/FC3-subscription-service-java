@@ -2,8 +2,10 @@ package com.fullcycle.subscription.infrastructure.rest;
 
 import com.fullcycle.subscription.ControllerTest;
 import com.fullcycle.subscription.application.Presenter;
+import com.fullcycle.subscription.application.subscription.CancelSubscription;
 import com.fullcycle.subscription.application.subscription.CreateSubscription;
 import com.fullcycle.subscription.domain.subscription.SubscriptionId;
+import com.fullcycle.subscription.domain.subscription.status.CanceledSubscriptionStatus;
 import com.fullcycle.subscription.infrastructure.rest.controllers.SubscriptionRestController;
 import com.fullcycle.subscription.infrastructure.rest.models.res.CreateSubscriptionResponse;
 import org.junit.jupiter.api.Assertions;
@@ -20,6 +22,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ControllerTest(controllers = SubscriptionRestController.class)
@@ -31,8 +34,14 @@ public class SubscriptionRestApiTest {
     @MockBean
     private CreateSubscription createSubscription;
 
+    @MockBean
+    private CancelSubscription cancelSubscription;
+
     @Captor
     private ArgumentCaptor<CreateSubscription.Input> createSubscriptionInputCaptor;
+
+    @Captor
+    private ArgumentCaptor<CancelSubscription.Input> cancelSubscriptionInputCaptor;
 
     @Test
     public void givenValidInput_whenCreateSuccessfully_shouldReturnSubscriptionId() throws Exception {
@@ -76,7 +85,47 @@ public class SubscriptionRestApiTest {
         Assertions.assertEquals(expectedAccountId, actualRequest.accountId());
     }
 
+    @Test
+    public void givenValidAccountId_whenCanceledSuccessfully_shouldReturnNewSubscriptionStatus() throws Exception {
+        // given
+        var expectedAccountId = "123";
+        var expectedStatus = CanceledSubscriptionStatus.CANCELED;
+        var expectedPlanId = 123L;
+        var expectedSubscriptionId = new SubscriptionId("SUBS123");
+
+        when(cancelSubscription.execute(any(), any())).thenAnswer(call -> {
+            Presenter<CancelSubscription.Output, CreateSubscriptionResponse> p = call.getArgument(1);
+            return p.apply(new CancelSubscriptionTestOutput(expectedSubscriptionId, expectedStatus));
+        });
+
+        // when
+        var aRequest = put("/subscriptions/active/cancel")
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .with(admin(expectedAccountId));
+
+        var aResponse = this.mvc.perform(aRequest);
+
+        // then
+        aResponse
+                .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.subscription_id").value(equalTo(expectedSubscriptionId.value())))
+                .andExpect(jsonPath("$.subscription_status").value(equalTo(expectedStatus)));
+
+        verify(cancelSubscription, times(1)).execute(cancelSubscriptionInputCaptor.capture(), any());
+
+        var actualRequest = cancelSubscriptionInputCaptor.getValue();
+
+        Assertions.assertEquals(expectedAccountId, actualRequest.accountId());
+    }
+
     record CreateSubscriptionTestOutput(SubscriptionId subscriptionId) implements CreateSubscription.Output {
+
+    }
+
+    record CancelSubscriptionTestOutput(SubscriptionId subscriptionId,
+                                        String subscriptionStatus) implements CancelSubscription.Output {
 
     }
 }

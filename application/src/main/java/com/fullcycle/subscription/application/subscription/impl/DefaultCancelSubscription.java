@@ -24,11 +24,9 @@ public class DefaultCancelSubscription extends CancelSubscription {
             throw new IllegalArgumentException("Input of DefaultCancelSubscription cannot be null");
         }
 
-        final var subscriptionId = new SubscriptionId(in.subscriptionId());
-
-        final var aSubscription = this.subscriptionGateway.subscriptionOfId(subscriptionId)
+        final var aSubscription = this.subscriptionGateway.latestSubscriptionOfAccount(new AccountId(in.accountId()))
                 .filter(it -> it.accountId().equals(new AccountId(in.accountId())))
-                .orElseThrow(() -> DomainException.notFound(Subscription.class, subscriptionId));
+                .orElseThrow(() -> DomainException.with("Subscription for account %s was not found".formatted(in.accountId())));
 
         aSubscription.execute(new SubscriptionCommand.CancelSubscription());
 
