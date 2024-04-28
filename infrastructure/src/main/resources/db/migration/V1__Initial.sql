@@ -50,7 +50,7 @@ CREATE TABLE subscriptions (
     updated_at TIMESTAMP(6) NOT NULL,
     due_date DATE NOT NULL,
     last_renew_dt TIMESTAMP(6),
-    last_transaction_id VARCHAR(32)
+    last_transaction_id VARCHAR(36)
 );
 
 CREATE INDEX idx_subscriptions_account_id ON subscriptions (account_id);
