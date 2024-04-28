@@ -1,7 +1,7 @@
-package com.fullcycle.subscription.infrastructure.authentication;
+package com.fullcycle.subscription.infrastructure.authentication.clientcredentials;
 
 import com.fullcycle.subscription.JacksonTest;
-import com.fullcycle.subscription.infrastructure.authentication.KeycloakAuthenticationGateway.KeycloakAuthenticationResult;
+import com.fullcycle.subscription.infrastructure.authentication.clientcredentials.KeycloakAuthenticationGateway.KeycloakAuthenticationResult;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

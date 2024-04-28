@@ -7,7 +7,6 @@ public abstract class CancelSubscription extends UseCase<CancelSubscription.Inpu
 
     public interface Input {
         String accountId();
-        String subscriptionId();
     }
 
     public interface Output {

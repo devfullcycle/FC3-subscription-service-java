@@ -1,6 +1,6 @@
 package com.fullcycle.subscription.infrastructure.configuration;
 
-import com.fullcycle.subscription.infrastructure.authentication.RefreshClientCredentials;
+import com.fullcycle.subscription.infrastructure.authentication.clientcredentials.RefreshClientCredentials;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;

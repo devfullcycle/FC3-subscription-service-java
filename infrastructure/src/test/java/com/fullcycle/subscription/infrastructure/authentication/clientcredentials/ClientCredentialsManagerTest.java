@@ -1,10 +1,10 @@
-package com.fullcycle.subscription.infrastructure.authentication;
+package com.fullcycle.subscription.infrastructure.authentication.clientcredentials;
 
 import com.fullcycle.subscription.domain.exceptions.InternalErrorException;
-import com.fullcycle.subscription.infrastructure.authentication.AuthenticationGateway.AuthenticationResult;
-import com.fullcycle.subscription.infrastructure.authentication.AuthenticationGateway.ClientCredentialsInput;
-import com.fullcycle.subscription.infrastructure.authentication.AuthenticationGateway.RefreshTokenInput;
-import com.fullcycle.subscription.infrastructure.authentication.ClientCredentialsManager.ClientCredentials;
+import com.fullcycle.subscription.infrastructure.authentication.clientcredentials.AuthenticationGateway.AuthenticationResult;
+import com.fullcycle.subscription.infrastructure.authentication.clientcredentials.AuthenticationGateway.ClientCredentialsInput;
+import com.fullcycle.subscription.infrastructure.authentication.clientcredentials.AuthenticationGateway.RefreshTokenInput;
+import com.fullcycle.subscription.infrastructure.authentication.clientcredentials.ClientCredentialsManager.ClientCredentials;
 import com.fullcycle.subscription.infrastructure.configuration.properties.KeycloakProperties;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
