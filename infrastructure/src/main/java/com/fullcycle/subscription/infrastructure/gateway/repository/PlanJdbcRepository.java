@@ -38,8 +38,9 @@ public class PlanJdbcRepository implements PlanGateway {
     }
 
     @Override
-    public boolean existsPlanOfId(PlanId anId) {
-        return false;
+    public boolean existsPlanOfId(final PlanId anId) {
+        final var sql = "SELECT id FROM plans WHERE id = :id";
+        return this.database.queryOne(sql, Map.of("id", anId.value()), rs -> rs.getString("id")).isPresent();
     }
 
     @Override
