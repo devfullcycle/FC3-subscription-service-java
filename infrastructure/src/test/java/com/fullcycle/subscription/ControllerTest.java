@@ -1,8 +1,8 @@
 package com.fullcycle.subscription;
 
 import com.fullcycle.subscription.infrastructure.configuration.SecurityConfig;
-import com.fullcycle.subscription.infrastructure.gateway.repository.AccountInMemoryRepository;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.AliasFor;
@@ -15,7 +15,8 @@ import java.lang.annotation.*;
 @Inherited
 @ActiveProfiles("test-integration")
 @WebMvcTest
-@Import({SecurityConfig.class, AccountInMemoryRepository.class})
+@ExtendWith(TimeZoneSetup.class)
+@Import({SecurityConfig.class, ControllerTestConfiguration.class})
 @Tag("integrationTest")
 public @interface ControllerTest {
 
