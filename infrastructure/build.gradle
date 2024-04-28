@@ -69,7 +69,7 @@ dependencyManagement {
 }
 
 flyway {
-    url = System.getenv('FLYWAY_DB') ?: 'jdbc:mysql://localhost:3306/adm_videos'
+    url = System.getenv('FLYWAY_DB') ?: 'jdbc:mysql://localhost:3306/subscription'
     user = System.getenv('FLYWAY_USER') ?: 'root'
     password = System.getenv('FLYWAY_PASS') ?: '123456'
 }
