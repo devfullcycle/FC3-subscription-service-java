@@ -2,6 +2,8 @@ package com.fullcycle.subscription.infrastructure.gateway.repository;
 
 import com.fullcycle.subscription.AbstractRepositoryTest;
 import com.fullcycle.subscription.domain.account.Account;
+import com.fullcycle.subscription.domain.account.AccountCreated;
+import com.fullcycle.subscription.domain.account.AccountEvent;
 import com.fullcycle.subscription.domain.account.AccountId;
 import com.fullcycle.subscription.domain.account.idp.UserId;
 import com.fullcycle.subscription.domain.person.Address;
@@ -12,8 +14,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.jdbc.Sql;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 class AccountJdbcRepositoryTest extends AbstractRepositoryTest {
 
@@ -60,9 +61,8 @@ class AccountJdbcRepositoryTest extends AbstractRepositoryTest {
         var expectedEmail = new Email("john@gmail.com");
         var expectedName = new Name("John", "Doe");
         var expectedDocument = new Document.Cpf("12312312332");
-        var expectedAddress = new Address("12332123", "1", "Casa 1", "BR");
 
-        var anAccount = Account.with(expectedId, 0, expectedUserId, expectedEmail, expectedName, expectedDocument, expectedAddress);
+        var anAccount = Account.newAccount(expectedId, expectedUserId, expectedEmail, expectedName, expectedDocument);
 
         // when
         var actualResponse = this.accountRepository().save(anAccount);
@@ -73,7 +73,7 @@ class AccountJdbcRepositoryTest extends AbstractRepositoryTest {
         assertEquals(expectedEmail, actualResponse.email());
         assertEquals(expectedName, actualResponse.name());
         assertEquals(expectedDocument, actualResponse.document());
-        assertEquals(expectedAddress, actualResponse.billingAddress());
+        assertNull(actualResponse.billingAddress());
 
         // then
         assertEquals(1, countAccounts());
@@ -86,7 +86,16 @@ class AccountJdbcRepositoryTest extends AbstractRepositoryTest {
         assertEquals(expectedEmail, actualAccount.email());
         assertEquals(expectedName, actualAccount.name());
         assertEquals(expectedDocument, actualAccount.document());
-        assertEquals(expectedAddress, actualAccount.billingAddress());
+        assertNull(actualAccount.billingAddress());
+
+        var actualEvents = this.eventRepository().allEventsOfAggregate(expectedId.value(), AccountEvent.TYPE);
+        assertEquals(1, actualEvents.size());
+
+        var actualEvent = (AccountCreated) actualEvents.getFirst();
+        assertEquals(expectedId.value(), actualEvent.accountId());
+        assertEquals(expectedEmail.value(), actualEvent.email());
+        assertEquals(expectedName.fullname(), actualEvent.fullname());
+        assertNotNull(actualEvent.occurredOn());
     }
 
     @Test

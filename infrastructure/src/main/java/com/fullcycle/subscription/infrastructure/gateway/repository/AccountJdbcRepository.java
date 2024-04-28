@@ -13,6 +13,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Objects;
@@ -22,9 +24,11 @@ import java.util.Optional;
 public class AccountJdbcRepository implements AccountGateway {
 
     private final JdbcClient jdbcClient;
+    private final EventJdbcRepository eventJdbcRepository;
 
-    public AccountJdbcRepository(final JdbcClient jdbcClient) {
+    public AccountJdbcRepository(final JdbcClient jdbcClient, final EventJdbcRepository eventJdbcRepository) {
         this.jdbcClient = Objects.requireNonNull(jdbcClient);
+        this.eventJdbcRepository = Objects.requireNonNull(eventJdbcRepository);
     }
 
     @Override
@@ -44,22 +48,25 @@ public class AccountJdbcRepository implements AccountGateway {
     }
 
     private RowMapper<Account> accountMapper() {
-        return (rs, rowNumber) -> Account.with(
-                new AccountId(rs.getString("id")),
-                rs.getInt("version"),
-                new UserId(rs.getString("idp_user_id")),
-                new Email(rs.getString("email")),
-                new Name(rs.getString("firstname"), rs.getString("lastname")),
-                Document.create(rs.getString("document_number"), rs.getString("document_type")),
-                rs.getString("address_zip_code") != null ?
-                        new Address(
-                                rs.getString("address_zip_code"),
-                                rs.getString("address_number"),
-                                rs.getString("address_complement"),
-                                rs.getString("address_country")
-                        ) :
-                        null
-        );
+        return (rs, rowNumber) -> {
+            final var zipCode = rs.getString("address_zip_code");
+            return Account.with(
+                    new AccountId(rs.getString("id")),
+                    rs.getInt("version"),
+                    new UserId(rs.getString("idp_user_id")),
+                    new Email(rs.getString("email")),
+                    new Name(rs.getString("firstname"), rs.getString("lastname")),
+                    Document.create(rs.getString("document_number"), rs.getString("document_type")),
+                    zipCode != null && !zipCode.isBlank() ?
+                            new Address(
+                                    zipCode,
+                                    rs.getString("address_number"),
+                                    rs.getString("address_complement"),
+                                    rs.getString("address_country")
+                            ) :
+                            null
+            );
+        };
     }
 
     @Override
@@ -68,6 +75,7 @@ public class AccountJdbcRepository implements AccountGateway {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public Account save(final Account anAccount) {
         if (anAccount.version() == 0) {
             create(anAccount);
@@ -75,6 +83,7 @@ public class AccountJdbcRepository implements AccountGateway {
             update(anAccount);
         }
 
+        this.eventJdbcRepository.saveAll(anAccount.domainEvents());
         return anAccount;
     }
 

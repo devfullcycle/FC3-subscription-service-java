@@ -26,7 +26,7 @@ public class AccountCreatedTest {
         var actualAccount = Account.newAccount(expectedAccountId, expectedUserId, expectedEmail, expectedName, expectedDocument);
 
         // when
-        var actualEvent = new AccountEvent.AccountCreated(actualAccount);
+        var actualEvent = new AccountCreated(actualAccount);
 
         // then
         Assertions.assertNotNull(actualAccount);
@@ -51,7 +51,7 @@ public class AccountCreatedTest {
         // when
         var actualError = Assertions.assertThrows(
                 DomainException.class,
-                () -> new AccountEvent.AccountCreated(expectedAccountId, expectedEmail, expectedName, expectedOccurredOn)
+                () -> new AccountCreated(expectedAccountId, expectedEmail, expectedName, expectedOccurredOn)
         );
 
         // then
@@ -71,7 +71,7 @@ public class AccountCreatedTest {
         // when
         var actualError = Assertions.assertThrows(
                 DomainException.class,
-                () -> new AccountEvent.AccountCreated(expectedAccountId, expectedEmail, expectedName, expectedOccurredOn)
+                () -> new AccountCreated(expectedAccountId, expectedEmail, expectedName, expectedOccurredOn)
         );
 
         // then
@@ -91,7 +91,7 @@ public class AccountCreatedTest {
         // when
         var actualError = Assertions.assertThrows(
                 DomainException.class,
-                () -> new AccountEvent.AccountCreated(expectedAccountId, expectedEmail, expectedName, expectedOccurredOn)
+                () -> new AccountCreated(expectedAccountId, expectedEmail, expectedName, expectedOccurredOn)
         );
 
         // then
@@ -111,7 +111,7 @@ public class AccountCreatedTest {
         // when
         var actualError = Assertions.assertThrows(
                 DomainException.class,
-                () -> new AccountEvent.AccountCreated(expectedAccountId, expectedEmail, expectedName, expectedOccurredOn)
+                () -> new AccountCreated(expectedAccountId, expectedEmail, expectedName, expectedOccurredOn)
         );
 
         // then
