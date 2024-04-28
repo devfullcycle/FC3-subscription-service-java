@@ -1,4 +1,4 @@
-package com.fullcycle.subscription.infrastructure.authentication;
+package com.fullcycle.subscription.infrastructure.authentication.clientcredentials;
 
 public interface AuthenticationGateway {
 

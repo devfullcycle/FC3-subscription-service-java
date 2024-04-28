@@ -1,6 +1,7 @@
 package com.fullcycle.subscription;
 
 import com.fullcycle.subscription.infrastructure.configuration.SecurityConfig;
+import com.fullcycle.subscription.infrastructure.gateway.repository.AccountInMemoryRepository;
 import org.junit.jupiter.api.Tag;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
@@ -14,7 +15,7 @@ import java.lang.annotation.*;
 @Inherited
 @ActiveProfiles("test-integration")
 @WebMvcTest
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, AccountInMemoryRepository.class})
 @Tag("integrationTest")
 public @interface ControllerTest {
 

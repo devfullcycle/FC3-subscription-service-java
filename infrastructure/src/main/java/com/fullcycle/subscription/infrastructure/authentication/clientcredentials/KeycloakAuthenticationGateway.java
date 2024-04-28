@@ -1,4 +1,4 @@
-package com.fullcycle.subscription.infrastructure.authentication;
+package com.fullcycle.subscription.infrastructure.authentication.clientcredentials;
 
 import com.fullcycle.subscription.domain.exceptions.InternalErrorException;
 import com.fullcycle.subscription.infrastructure.configuration.annotations.Keycloak;

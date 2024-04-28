@@ -1,9 +1,9 @@
-package com.fullcycle.subscription.infrastructure.authentication;
+package com.fullcycle.subscription.infrastructure.authentication.clientcredentials;
 
 import com.fullcycle.subscription.AbstractRestClientTest;
-import com.fullcycle.subscription.infrastructure.authentication.AuthenticationGateway.ClientCredentialsInput;
-import com.fullcycle.subscription.infrastructure.authentication.AuthenticationGateway.RefreshTokenInput;
-import com.fullcycle.subscription.infrastructure.authentication.KeycloakAuthenticationGateway.KeycloakAuthenticationResult;
+import com.fullcycle.subscription.infrastructure.authentication.clientcredentials.AuthenticationGateway.ClientCredentialsInput;
+import com.fullcycle.subscription.infrastructure.authentication.clientcredentials.AuthenticationGateway.RefreshTokenInput;
+import com.fullcycle.subscription.infrastructure.authentication.clientcredentials.KeycloakAuthenticationGateway.KeycloakAuthenticationResult;
 import com.fullcycle.subscription.infrastructure.json.Json;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
