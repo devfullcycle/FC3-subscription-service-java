@@ -4,7 +4,7 @@ import com.fullcycle.subscription.domain.utils.InstantUtils;
 
 import java.time.Instant;
 
-record SubscriptionCreated(String subscriptionId, String accountId, Long planId, Instant occurredOn)
+public record SubscriptionCreated(String subscriptionId, String accountId, Long planId, Instant occurredOn)
         implements SubscriptionEvent {
 
     public SubscriptionCreated {

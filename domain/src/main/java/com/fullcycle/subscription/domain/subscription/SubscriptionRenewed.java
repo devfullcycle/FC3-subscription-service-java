@@ -6,7 +6,7 @@ import com.fullcycle.subscription.domain.utils.InstantUtils;
 import java.time.Instant;
 import java.time.LocalDate;
 
-record SubscriptionRenewed(
+public record SubscriptionRenewed(
         String subscriptionId,
         String accountId,
         Long planId,
