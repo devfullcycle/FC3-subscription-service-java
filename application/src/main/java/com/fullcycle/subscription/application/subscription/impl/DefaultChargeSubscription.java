@@ -11,7 +11,6 @@ import com.fullcycle.subscription.domain.payment.PaymentGateway;
 import com.fullcycle.subscription.domain.payment.Transaction;
 import com.fullcycle.subscription.domain.plan.Plan;
 import com.fullcycle.subscription.domain.plan.PlanGateway;
-import com.fullcycle.subscription.domain.subscription.Subscription;
 import com.fullcycle.subscription.domain.subscription.SubscriptionCommand;
 import com.fullcycle.subscription.domain.subscription.SubscriptionGateway;
 import com.fullcycle.subscription.domain.subscription.SubscriptionId;
@@ -52,15 +51,14 @@ public class DefaultChargeSubscription extends ChargeSubscription {
         }
 
         final var accountId = new AccountId(in.accountId());
-        final var subscriptionId = new SubscriptionId(in.subscriptionId());
         final var now = clock.instant();
 
-        final var aSubscription = subscriptionGateway.subscriptionOfId(subscriptionId)
+        final var aSubscription = subscriptionGateway.latestSubscriptionOfAccount(accountId)
                 .filter(it -> it.accountId().equals(accountId))
-                .orElseThrow(() -> DomainException.notFound(Subscription.class, subscriptionId));
+                .orElseThrow(() -> DomainException.with("Subscription for account %s was not found".formatted(in.accountId())));
 
         if (aSubscription.dueDate().isAfter(LocalDate.ofInstant(now, ZoneId.systemDefault()))) {
-            return new StdOutput(subscriptionId, aSubscription.status().value(), aSubscription.dueDate(), null);
+            return new StdOutput(aSubscription.id(), aSubscription.status().value(), aSubscription.dueDate(), null);
         }
 
         final var aPlan = this.planGateway.planOfId(aSubscription.planId())
@@ -81,7 +79,7 @@ public class DefaultChargeSubscription extends ChargeSubscription {
         }
 
         this.subscriptionGateway.save(aSubscription);
-        return new StdOutput(subscriptionId, aSubscription.status().value(), aSubscription.dueDate(), actualTransaction);
+        return new StdOutput(aSubscription.id(), aSubscription.status().value(), aSubscription.dueDate(), actualTransaction);
     }
 
     private boolean hasTolerableDays(final LocalDate dueDate, final Instant now) {
