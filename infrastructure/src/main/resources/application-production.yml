@@ -4,6 +4,12 @@ keycloak:
   host: ${KEYCLOAK_HOST}
   realm: ${KEYCLOAK_REALM}
 
+mysql:
+  username: ${DATABASE_MYSQL_USERNAME}
+  password: ${DATABASE_MYSQL_PASSWORD}
+  schema: subscription
+  url: ${DATABASE_MYSQL_URL}
+
 rest-client:
   base-url: ${BASE_URL}
   keycloak:
