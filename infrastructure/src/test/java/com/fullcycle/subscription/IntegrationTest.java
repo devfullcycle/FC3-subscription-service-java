@@ -2,6 +2,7 @@ package com.fullcycle.subscription;
 
 import com.fullcycle.subscription.infrastructure.configuration.WebServerConfig;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchRepositoriesAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,6 +17,7 @@ import java.lang.annotation.*;
 @EnableAutoConfiguration(exclude = {
         ElasticsearchRepositoriesAutoConfiguration.class
 })
+@ExtendWith(TimeZoneSetup.class)
 @SpringBootTest(classes = {
         WebServerConfig.class,
         IntegrationTestConfiguration.class,

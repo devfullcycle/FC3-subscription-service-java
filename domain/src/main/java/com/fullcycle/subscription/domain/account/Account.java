@@ -4,7 +4,6 @@ import com.fullcycle.subscription.domain.AggregateRoot;
 import com.fullcycle.subscription.domain.account.AccountCommand.ChangeDocumentCommand;
 import com.fullcycle.subscription.domain.account.AccountCommand.ChangeEmailCommand;
 import com.fullcycle.subscription.domain.account.AccountCommand.ChangeProfileCommand;
-import com.fullcycle.subscription.domain.account.AccountEvent.AccountCreated;
 import com.fullcycle.subscription.domain.account.idp.UserId;
 import com.fullcycle.subscription.domain.person.Address;
 import com.fullcycle.subscription.domain.person.Document;
