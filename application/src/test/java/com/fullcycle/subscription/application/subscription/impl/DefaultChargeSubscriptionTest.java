@@ -9,6 +9,7 @@ import com.fullcycle.subscription.domain.payment.Payment;
 import com.fullcycle.subscription.domain.payment.PaymentGateway;
 import com.fullcycle.subscription.domain.payment.PixPayment;
 import com.fullcycle.subscription.domain.payment.Transaction;
+import com.fullcycle.subscription.domain.person.Address;
 import com.fullcycle.subscription.domain.plan.Plan;
 import com.fullcycle.subscription.domain.plan.PlanGateway;
 import com.fullcycle.subscription.domain.subscription.Subscription;
@@ -69,7 +70,7 @@ class DefaultChargeSubscriptionTest extends UnitTest {
 
         // when
         var actualOutput =
-                this.target.execute(new ChargeSubscriptionTestInput(expectedAccount.id().value(), expectedSubscription.id().value(), Payment.PIX, null));
+                this.target.execute(new ChargeSubscriptionTestInput(expectedAccount.id().value(), Payment.PIX, "", new ChargeSubscriptionAddressTestInput(expectedAccount.billingAddress())));
 
         // then
         Assertions.assertEquals(expectedSubscription.id(), actualOutput.subscriptionId());
@@ -92,12 +93,11 @@ class DefaultChargeSubscriptionTest extends UnitTest {
         when(clock.instant()).thenReturn(InstantUtils.now());
         when(subscriptionGateway.latestSubscriptionOfAccount(any())).thenReturn(Optional.of(expectedSubscription));
         when(planGateway.planOfId(any())).thenReturn(Optional.of(expectedPlan));
-        when(accountGateway.accountOfId(any())).thenReturn(Optional.of(expectedAccount));
         when(paymentGateway.processPayment(any())).thenReturn(expectedTransaction);
 
         // when
         var actualOutput =
-                this.target.execute(new ChargeSubscriptionTestInput(expectedAccount.id().value(), expectedSubscription.id().value(), Payment.PIX, null));
+                this.target.execute(new ChargeSubscriptionTestInput(expectedAccount.id().value(), Payment.PIX, "", new ChargeSubscriptionAddressTestInput(expectedAccount.billingAddress())));
 
         // then
         Assertions.assertEquals(expectedSubscription.id(), actualOutput.subscriptionId());
@@ -107,7 +107,6 @@ class DefaultChargeSubscriptionTest extends UnitTest {
 
         verify(subscriptionGateway, times(1)).latestSubscriptionOfAccount(eq(expectedAccount.id()));
         verify(planGateway, times(1)).planOfId(eq(expectedPlan.id()));
-        verify(accountGateway, times(1)).accountOfId(eq(expectedAccount.id()));
         verify(subscriptionGateway, times(1)).save(any());
         verify(paymentGateway, times(1)).processPayment(paymentCaptor.capture());
 
@@ -131,12 +130,11 @@ class DefaultChargeSubscriptionTest extends UnitTest {
         when(clock.instant()).thenReturn(InstantUtils.now());
         when(subscriptionGateway.latestSubscriptionOfAccount(any())).thenReturn(Optional.of(expectedSubscription));
         when(planGateway.planOfId(any())).thenReturn(Optional.of(expectedPlan));
-        when(accountGateway.accountOfId(any())).thenReturn(Optional.of(expectedAccount));
         when(paymentGateway.processPayment(any())).thenReturn(expectedTransaction);
 
         // when
         var actualOutput =
-                this.target.execute(new ChargeSubscriptionTestInput(expectedAccount.id().value(), expectedSubscription.id().value(), Payment.PIX, null));
+                this.target.execute(new ChargeSubscriptionTestInput(expectedAccount.id().value(), Payment.PIX, "", new ChargeSubscriptionAddressTestInput(expectedAccount.billingAddress())));
 
         // then
         Assertions.assertEquals(expectedSubscription.id(), actualOutput.subscriptionId());
@@ -146,7 +144,6 @@ class DefaultChargeSubscriptionTest extends UnitTest {
 
         verify(subscriptionGateway, times(1)).latestSubscriptionOfAccount(eq(expectedAccount.id()));
         verify(planGateway, times(1)).planOfId(eq(expectedPlan.id()));
-        verify(accountGateway, times(1)).accountOfId(eq(expectedAccount.id()));
         verify(subscriptionGateway, times(1)).save(any());
         verify(paymentGateway, times(1)).processPayment(paymentCaptor.capture());
 
@@ -170,12 +167,11 @@ class DefaultChargeSubscriptionTest extends UnitTest {
         when(clock.instant()).thenReturn(InstantUtils.now());
         when(subscriptionGateway.latestSubscriptionOfAccount(any())).thenReturn(Optional.of(expectedSubscription));
         when(planGateway.planOfId(any())).thenReturn(Optional.of(expectedPlan));
-        when(accountGateway.accountOfId(any())).thenReturn(Optional.of(expectedAccount));
         when(paymentGateway.processPayment(any())).thenReturn(expectedTransaction);
 
         // when
         var actualOutput =
-                this.target.execute(new ChargeSubscriptionTestInput(expectedAccount.id().value(), expectedSubscription.id().value(), Payment.PIX, null));
+                this.target.execute(new ChargeSubscriptionTestInput(expectedAccount.id().value(), Payment.PIX, "", new ChargeSubscriptionAddressTestInput(expectedAccount.billingAddress())));
 
         // then
         Assertions.assertEquals(expectedSubscription.id(), actualOutput.subscriptionId());
@@ -185,14 +181,14 @@ class DefaultChargeSubscriptionTest extends UnitTest {
 
         verify(subscriptionGateway, times(1)).latestSubscriptionOfAccount(eq(expectedAccount.id()));
         verify(planGateway, times(1)).planOfId(eq(expectedPlan.id()));
-        verify(accountGateway, times(1)).accountOfId(eq(expectedAccount.id()));
         verify(subscriptionGateway, times(1)).save(any());
         verify(paymentGateway, times(1)).processPayment(paymentCaptor.capture());
 
         var actualPayment = paymentCaptor.getValue();
         Assertions.assertInstanceOf(PixPayment.class, actualPayment);
         Assertions.assertNotNull(actualPayment.orderId());
-        Assertions.assertEquals(expectedPlan.price().amount(), actualPayment.amount());verify(subscriptionGateway, times(1)).save(any());
+        Assertions.assertEquals(expectedPlan.price().amount(), actualPayment.amount());
+        verify(subscriptionGateway, times(1)).save(any());
     }
 
     @Test
@@ -209,12 +205,11 @@ class DefaultChargeSubscriptionTest extends UnitTest {
         when(clock.instant()).thenReturn(InstantUtils.now());
         when(subscriptionGateway.latestSubscriptionOfAccount(any())).thenReturn(Optional.of(expectedSubscription));
         when(planGateway.planOfId(any())).thenReturn(Optional.of(expectedPlan));
-        when(accountGateway.accountOfId(any())).thenReturn(Optional.of(expectedAccount));
         when(paymentGateway.processPayment(any())).thenReturn(expectedTransaction);
 
         // when
         var actualOutput =
-                this.target.execute(new ChargeSubscriptionTestInput(expectedAccount.id().value(), expectedSubscription.id().value(), Payment.PIX, null));
+                this.target.execute(new ChargeSubscriptionTestInput(expectedAccount.id().value(), Payment.PIX, "", new ChargeSubscriptionAddressTestInput(expectedAccount.billingAddress())));
 
         // then
         Assertions.assertEquals(expectedSubscription.id(), actualOutput.subscriptionId());
@@ -224,7 +219,6 @@ class DefaultChargeSubscriptionTest extends UnitTest {
 
         verify(subscriptionGateway, times(1)).latestSubscriptionOfAccount(eq(expectedAccount.id()));
         verify(planGateway, times(1)).planOfId(eq(expectedPlan.id()));
-        verify(accountGateway, times(1)).accountOfId(eq(expectedAccount.id()));
         verify(subscriptionGateway, times(1)).save(any());
         verify(paymentGateway, times(1)).processPayment(paymentCaptor.capture());
 
@@ -246,8 +240,31 @@ class DefaultChargeSubscriptionTest extends UnitTest {
 
     record ChargeSubscriptionTestInput(
             String accountId,
-            String subscriptionId,
             String paymentType,
-            String creditCardToken
+            String creditCardToken,
+            Address billingAddress
     ) implements ChargeSubscription.Input {}
+
+    record ChargeSubscriptionAddressTestInput(Address address) implements ChargeSubscription.Input.Address {
+
+        @Override
+        public String zipcode() {
+            return address.zipcode();
+        }
+
+        @Override
+        public String number() {
+            return address.number();
+        }
+
+        @Override
+        public String country() {
+            return address.country();
+        }
+
+        @Override
+        public String complement() {
+            return address.complement();
+        }
+    }
 }

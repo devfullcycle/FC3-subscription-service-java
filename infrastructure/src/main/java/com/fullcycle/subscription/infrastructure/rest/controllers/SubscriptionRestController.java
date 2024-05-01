@@ -54,10 +54,10 @@ public class SubscriptionRestController implements SubscriptionRestApi {
 
     @Override
     public ResponseEntity<ChargeSubscriptionResponse> chargeActiveSubscription(final ChargeSubscriptionRequest req, final CodeflixUser principal) {
-        record ChargeSubscriptionInput(String accountId, String paymentType, String creditCardToken)
+        record ChargeSubscriptionInput(String accountId, String paymentType, String creditCardToken, ChargeSubscriptionRequest.BillingAddress billingAddress)
                 implements ChargeSubscription.Input {}
 
-        final var res = this.chargeSubscription.execute(new ChargeSubscriptionInput(principal.accountId(), req.paymentType(), req.creditCardToken()), ChargeSubscriptionResponse::new);
+        final var res = this.chargeSubscription.execute(new ChargeSubscriptionInput(principal.accountId(), req.paymentType(), req.creditCardToken(), req.billingAddress()), ChargeSubscriptionResponse::new);
         return ResponseEntity.ok(res);
     }
 }

@@ -6,9 +6,10 @@ import com.fullcycle.subscription.domain.plan.PlanGateway;
 import com.fullcycle.subscription.domain.plan.PlanId;
 import com.fullcycle.subscription.infrastructure.jdbc.DatabaseClient;
 import com.fullcycle.subscription.infrastructure.jdbc.RowMap;
+import com.fullcycle.subscription.infrastructure.utils.JdbcUtil;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.*;
 
 @Repository
@@ -44,6 +45,7 @@ public class PlanJdbcRepository implements PlanGateway {
     }
 
     @Override
+    @Transactional
     public Plan save(final Plan plan) {
         if (plan.version() == 0) {
             return create(plan);
@@ -112,9 +114,9 @@ public class PlanJdbcRepository implements PlanGateway {
                     rs.getString("description"),
                     rs.getBoolean("active"),
                     new Money(rs.getString("currency"), rs.getDouble("amount")),
-                    rs.getObject("created_at", Instant.class),
-                    rs.getObject("updated_at", Instant.class),
-                    rs.getObject("deleted_at", Instant.class)
+                    JdbcUtil.getInstant(rs, "created_at"),
+                    JdbcUtil.getInstant(rs, "updated_at"),
+                    JdbcUtil.getInstant(rs, "deleted_at")
             );
         };
     }

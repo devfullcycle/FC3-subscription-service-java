@@ -8,11 +8,11 @@ import com.fullcycle.subscription.domain.subscription.SubscriptionId;
 import com.fullcycle.subscription.domain.utils.IdUtils;
 import com.fullcycle.subscription.infrastructure.jdbc.DatabaseClient;
 import com.fullcycle.subscription.infrastructure.jdbc.RowMap;
+import com.fullcycle.subscription.infrastructure.utils.JdbcUtil;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -109,12 +109,12 @@ public class SubscriptionJdbcRepository implements SubscriptionGateway {
                     rs.getInt("version"),
                     new AccountId(rs.getString("account_id")),
                     new PlanId(rs.getLong("plan_id")),
-                    rs.getDate("due_date").toLocalDate(),
+                    JdbcUtil.getLocalDate(rs, "due_date"),
                     rs.getString("status"),
-                    rs.getObject("last_renew_dt", Instant.class),
+                    JdbcUtil.getInstant(rs, "last_renew_dt"),
                     rs.getString("last_transaction_id"),
-                    rs.getObject("created_at", Instant.class),
-                    rs.getObject("updated_at", Instant.class)
+                    JdbcUtil.getInstant(rs, "created_at"),
+                    JdbcUtil.getInstant(rs, "updated_at")
             );
         };
     }

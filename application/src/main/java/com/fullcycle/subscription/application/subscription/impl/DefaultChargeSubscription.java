@@ -1,8 +1,6 @@
 package com.fullcycle.subscription.application.subscription.impl;
 
 import com.fullcycle.subscription.application.subscription.ChargeSubscription;
-import com.fullcycle.subscription.domain.account.Account;
-import com.fullcycle.subscription.domain.account.AccountGateway;
 import com.fullcycle.subscription.domain.account.AccountId;
 import com.fullcycle.subscription.domain.exceptions.DomainException;
 import com.fullcycle.subscription.domain.payment.BillingAddress;
@@ -24,20 +22,17 @@ public class DefaultChargeSubscription extends ChargeSubscription {
 
     private static final int MAX_INCOMPLETE_DAYS = 2;
 
-    private final AccountGateway accountGateway;
     private final Clock clock;
     private final PaymentGateway paymentGateway;
     private final PlanGateway planGateway;
     private final SubscriptionGateway subscriptionGateway;
 
     public DefaultChargeSubscription(
-            final AccountGateway accountGateway,
             final Clock clock,
             final PaymentGateway paymentGateway,
             final PlanGateway planGateway,
             final SubscriptionGateway subscriptionGateway
     ) {
-        this.accountGateway = Objects.requireNonNull(accountGateway);
         this.clock = Objects.requireNonNull(clock);
         this.paymentGateway = Objects.requireNonNull(paymentGateway);
         this.planGateway = Objects.requireNonNull(planGateway);
@@ -64,10 +59,7 @@ public class DefaultChargeSubscription extends ChargeSubscription {
         final var aPlan = this.planGateway.planOfId(aSubscription.planId())
                 .orElseThrow(() -> DomainException.notFound(Plan.class, aSubscription.planId()));
 
-        final var anUserAccount = this.accountGateway.accountOfId(accountId)
-                .orElseThrow(() -> DomainException.notFound(Account.class, accountId));
-
-        final var aPayment = this.newPaymentWith(in, aPlan, anUserAccount);
+        final var aPayment = this.newPaymentWith(in, aPlan);
         final var actualTransaction = this.paymentGateway.processPayment(aPayment);
 
         if (actualTransaction.isSuccess()) {
@@ -86,17 +78,13 @@ public class DefaultChargeSubscription extends ChargeSubscription {
         return ChronoUnit.DAYS.between(dueDate, LocalDate.ofInstant(now, ZoneOffset.UTC)) <= MAX_INCOMPLETE_DAYS;
     }
 
-    private Payment newPaymentWith(final Input in, final Plan aPlan, final Account anUserAccount) {
+    private Payment newPaymentWith(final Input in, final Plan aPlan) {
+        var bi = in.billingAddress();
         return Payment.create(
                 in.paymentType(),
                 IdUtils.uniqueId(),
                 aPlan.price().amount(),
-                new BillingAddress(
-                        anUserAccount.billingAddress().zipcode(),
-                        anUserAccount.billingAddress().number(),
-                        anUserAccount.billingAddress().complement(),
-                        anUserAccount.billingAddress().country()
-                ),
+                new BillingAddress(bi.zipcode(), bi.number(), bi.complement(), bi.country()),
                 in.creditCardToken()
         );
     }

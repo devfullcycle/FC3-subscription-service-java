@@ -142,6 +142,10 @@ public class SubscriptionRestApiTest {
         var expectedTransactionError = "No fund";
         var expectedPaymentType = "credit_card";
         var expectedCreditCardToken = "123222";
+        var expectedZipCode = "12312123";
+        var expectedNumber = "1";
+        var expectedCountry = "BR";
+        var expectedComplement = "A";
 
         when(chargeSubscription.execute(any(), any())).thenAnswer(call -> {
             Presenter<ChargeSubscription.Output, ChargeSubscriptionResponse> p = call.getArgument(1);
@@ -151,9 +155,15 @@ public class SubscriptionRestApiTest {
         var json = """
                 {
                     "payment_type": "%s",
-                    "credit_card_token": "%s"
+                    "credit_card_token": "%s",
+                    "billing_address": {
+                      "zipcode": "%s",
+                      "number": "%s",
+                      "complement": "%s",
+                      "country": "%s"
+                    }
                 }
-                """.formatted(expectedPaymentType, expectedCreditCardToken);
+                """.formatted(expectedPaymentType, expectedCreditCardToken, expectedZipCode, expectedNumber, expectedComplement, expectedCountry);
 
         // when
         var aRequest = put("/subscriptions/active/charge")
@@ -181,6 +191,10 @@ public class SubscriptionRestApiTest {
         Assertions.assertEquals(expectedAccountId, actualRequest.accountId());
         Assertions.assertEquals(expectedCreditCardToken, actualRequest.creditCardToken());
         Assertions.assertEquals(expectedPaymentType, actualRequest.paymentType());
+        Assertions.assertEquals(expectedZipCode, actualRequest.billingAddress().zipcode());
+        Assertions.assertEquals(expectedNumber, actualRequest.billingAddress().number());
+        Assertions.assertEquals(expectedComplement, actualRequest.billingAddress().complement());
+        Assertions.assertEquals(expectedCountry, actualRequest.billingAddress().country());
     }
 
     record CreateSubscriptionTestOutput(SubscriptionId subscriptionId) implements CreateSubscription.Output {

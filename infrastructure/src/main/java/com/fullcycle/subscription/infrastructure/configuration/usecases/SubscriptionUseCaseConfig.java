@@ -36,12 +36,11 @@ public class SubscriptionUseCaseConfig {
 
     @Bean
     ChargeSubscription chargeSubscription(
-            final AccountGateway accountGateway,
             final Clock clock,
             final PaymentGateway paymentGateway,
             final PlanGateway planGateway,
             final SubscriptionGateway subscriptionGateway
     ) {
-        return new DefaultChargeSubscription(accountGateway, clock, paymentGateway, planGateway, subscriptionGateway);
+        return new DefaultChargeSubscription(clock, paymentGateway, planGateway, subscriptionGateway);
     }
 }

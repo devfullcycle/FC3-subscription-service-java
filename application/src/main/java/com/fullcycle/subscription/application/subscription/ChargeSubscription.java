@@ -12,6 +12,14 @@ public abstract class ChargeSubscription extends UseCase<ChargeSubscription.Inpu
         String accountId();
         String paymentType();
         String creditCardToken();
+        Address billingAddress();
+
+        interface Address {
+            String zipcode();
+            String number();
+            String country();
+            String complement();
+        }
     }
 
     public interface Output {
