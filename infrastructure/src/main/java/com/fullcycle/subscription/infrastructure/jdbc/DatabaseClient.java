@@ -12,6 +12,8 @@ public interface DatabaseClient {
 
     <T> List<T> query(String sql, Map<String, Object> params, RowMap<T> mapper);
 
+    Number insert(String sql, Map<String, Object> params);
+
     int update(String sql, Map<String, Object> params);
 
 }

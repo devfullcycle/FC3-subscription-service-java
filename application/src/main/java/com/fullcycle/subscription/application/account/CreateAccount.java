@@ -6,6 +6,7 @@ import com.fullcycle.subscription.domain.account.AccountId;
 public abstract class CreateAccount extends UseCase<CreateAccount.Input, CreateAccount.Output> {
 
     public interface Input {
+        String accountId();
         String userId();
         String email();
         String firstname();

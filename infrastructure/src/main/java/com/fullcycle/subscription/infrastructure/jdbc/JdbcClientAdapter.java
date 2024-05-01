@@ -2,6 +2,7 @@ package com.fullcycle.subscription.infrastructure.jdbc;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,17 @@ public class JdbcClientAdapter implements DatabaseClient {
     @Override
     public <T> List<T> query(String sql, Map<String, Object> params, RowMap<T> mapper) {
         return this.target.sql(sql).params(params).query(new RowMapAdapter<>(mapper)).list();
+    }
+
+    @Override
+    public Number insert(String sql, Map<String, Object> params) {
+        try {
+            var holder = new GeneratedKeyHolder();
+            this.target.sql(sql).params(params).update(holder);
+            return holder.getKey();
+        } catch (DataIntegrityViolationException ex) {
+            throw ex;
+        }
     }
 
     @Override

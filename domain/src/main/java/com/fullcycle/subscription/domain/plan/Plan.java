@@ -174,4 +174,8 @@ public class Plan extends AggregateRoot<PlanId> {
         this.assertArgumentNotNull(createdAt, "'createdAt' should not be null");
         this.createdAt = createdAt;
     }
+
+    public Plan withId(final PlanId planId) {
+        return Plan.with(planId, version(), name(), description(), active(), price(), createdAt(), updatedAt(), deletedAt());
+    }
 }

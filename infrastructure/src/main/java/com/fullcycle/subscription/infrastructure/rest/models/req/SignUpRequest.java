@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fullcycle.subscription.application.account.CreateAccount;
 import com.fullcycle.subscription.application.account.CreateIdpUser;
+import com.fullcycle.subscription.domain.account.AccountId;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -35,6 +36,7 @@ public class SignUpRequest implements CreateIdpUser.Input, CreateAccount.Input {
     private final String documentNumber;
 
     private final String userId;
+    private final String accountId;
 
     private SignUpRequest(
             String documentNumber,
@@ -43,7 +45,8 @@ public class SignUpRequest implements CreateIdpUser.Input, CreateAccount.Input {
             String email,
             String lastname,
             String firstname,
-            String userId
+            String userId,
+            String accountId
     ) {
         this.documentNumber = documentNumber;
         this.documentType = documentType;
@@ -52,6 +55,7 @@ public class SignUpRequest implements CreateIdpUser.Input, CreateAccount.Input {
         this.lastname = lastname;
         this.firstname = firstname;
         this.userId = userId;
+        this.accountId = accountId;
     }
 
     @JsonCreator
@@ -70,6 +74,7 @@ public class SignUpRequest implements CreateIdpUser.Input, CreateAccount.Input {
                 email,
                 lastname,
                 firstname,
+                "",
                 ""
         );
     }
@@ -106,6 +111,24 @@ public class SignUpRequest implements CreateIdpUser.Input, CreateAccount.Input {
         return userId;
     }
 
+    @Override
+    public String accountId() {
+        return accountId;
+    }
+
+    public SignUpRequest with(final AccountId accountId) {
+        return new SignUpRequest(
+                documentNumber(),
+                documentType(),
+                password(),
+                email(),
+                lastname(),
+                firstname(),
+                userId(),
+                accountId.value()
+        );
+    }
+
     public SignUpRequest with(final CreateIdpUser.Output out) {
         return new SignUpRequest(
                 documentNumber(),
@@ -114,7 +137,8 @@ public class SignUpRequest implements CreateIdpUser.Input, CreateAccount.Input {
                 email(),
                 lastname(),
                 firstname(),
-                out.idpUserId().value()
+                out.idpUserId().value(),
+                accountId()
         );
     }
 }

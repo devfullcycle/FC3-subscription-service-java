@@ -1,6 +1,7 @@
 package com.fullcycle.subscription.application.account.impl;
 
 import com.fullcycle.subscription.application.account.CreateIdpUser;
+import com.fullcycle.subscription.domain.account.AccountId;
 import com.fullcycle.subscription.domain.account.idp.IdentityProviderGateway;
 import com.fullcycle.subscription.domain.account.idp.User;
 import com.fullcycle.subscription.domain.account.idp.UserId;
@@ -27,7 +28,7 @@ public class DefaultCreateIdpUser extends CreateIdpUser {
     }
 
     private User userWith(final Input in) {
-        return User.newUser(new Name(in.firstname(), in.lastname()), new Email(in.email()), in.password());
+        return User.newUser(new AccountId(in.accountId()), new Name(in.firstname(), in.lastname()), new Email(in.email()), in.password());
     }
 
     record StdOutput(UserId idpUserId) implements Output {

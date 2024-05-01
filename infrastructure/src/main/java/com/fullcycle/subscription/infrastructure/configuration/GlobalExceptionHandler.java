@@ -1,5 +1,6 @@
 package com.fullcycle.subscription.infrastructure.configuration;
 
+import com.fullcycle.subscription.domain.exceptions.DomainException;
 import com.fullcycle.subscription.domain.validation.Error;
 import com.fullcycle.subscription.domain.validation.handler.Notification;
 import com.fullcycle.subscription.infrastructure.exceptions.ForbiddenException;
@@ -16,6 +17,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.List;
+import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
@@ -24,6 +26,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         return ResponseEntity.unprocessableEntity()
                 .body(Notification.create(covertError(ex.getBindingResult().getAllErrors())));
+    }
+
+    @ExceptionHandler(DomainException.class)
+    public ResponseEntity<?> handleDomainException(DomainException ex) {
+        return ResponseEntity.unprocessableEntity().body(Map.of("message", ex.getMessage()));
     }
 
     @ExceptionHandler(ForbiddenException.class)
