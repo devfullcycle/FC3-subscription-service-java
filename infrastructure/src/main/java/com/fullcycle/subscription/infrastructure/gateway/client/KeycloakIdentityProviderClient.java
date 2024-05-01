@@ -29,6 +29,7 @@ import java.util.Objects;
 public class KeycloakIdentityProviderClient implements IdentityProviderGateway {
 
     private static final Logger log = LoggerFactory.getLogger(KeycloakIdentityProviderClient.class);
+    public static final String USER_GROUP_PATH = "/{id}/groups/{groupId}";
 
     private final RestClient restClient;
     private final GetClientCredentials getClientCredentials;
@@ -52,7 +53,7 @@ public class KeycloakIdentityProviderClient implements IdentityProviderGateway {
      */
     @Override
     public UserId create(final User anUser) {
-        log.info("Creating user with Keycloak IDP [accountId:{}", anUser.accountId().value());
+        log.info("Creating user with Keycloak IDP [accountId:{}]", anUser.accountId().value());
 
         final var map = new HashMap<>();
         map.put("firstName", anUser.name().firstname());
@@ -95,13 +96,43 @@ public class KeycloakIdentityProviderClient implements IdentityProviderGateway {
     }
 
     @Override
-    public void addUserToGroup(UserId anId, GroupId aGroupId) {
+    public void addUserToGroup(UserId userId, GroupId aGroupId) {
+        log.info("Adding user to group on Keycloak IDP [userId:{}] [groupId:{}]", userId.value(), aGroupId.value());
+        try {
+            final var res = this.restClient.put()
+                    .uri(this.adminUsersUri + USER_GROUP_PATH, userId.value(), aGroupId.value())
+                    .header(HttpHeaders.AUTHORIZATION, "bearer " + getClientCredentials.retrieve())
+                    .retrieve()
+                    .toBodilessEntity();
 
+            if (!res.getStatusCode().is2xxSuccessful()) {
+                throw InternalErrorException.with("Unexpected status code from Keycloak [status:%s]".formatted(res.getStatusCode()));
+            }
+            log.debug("User added successfully on Keycloak [userId:{}] [groupId:{}]", userId.value(), aGroupId.value());
+        } catch (final Throwable t) {
+            log.error("Unexpected error observed from Keycloak after add user to group attempt [userId:{}] [groupId:{}]: {}", userId.value(), aGroupId.value(), t.getMessage());
+            throw InternalErrorException.with(t.getMessage());
+        }
     }
 
     @Override
-    public void removeUserFromGroup(UserId anId, GroupId aGroupId) {
+    public void removeUserFromGroup(UserId userId, GroupId aGroupId) {
+        log.info("Removing user to group on Keycloak IDP [userId:{}] [groupId:{}]", userId.value(), aGroupId.value());
+        try {
+            final var res = this.restClient.delete()
+                    .uri(this.adminUsersUri + USER_GROUP_PATH, userId.value(), aGroupId.value())
+                    .header(HttpHeaders.AUTHORIZATION, "bearer " + getClientCredentials.retrieve())
+                    .retrieve()
+                    .toBodilessEntity();
 
+            if (!res.getStatusCode().is2xxSuccessful()) {
+                throw InternalErrorException.with("Unexpected status code from Keycloak [status:%s]".formatted(res.getStatusCode()));
+            }
+            log.debug("User removed successfully on Keycloak [userId:{}] [groupId:{}]", userId.value(), aGroupId.value());
+        } catch (final Throwable t) {
+            log.error("Unexpected error observed from Keycloak after remove user to group attempt [userId:{}] [groupId:{}]: {}", userId.value(), aGroupId.value(), t.getMessage());
+            throw InternalErrorException.with(t.getMessage());
+        }
     }
 
     private UserId mapUserId(ResponseEntity<Void> res) {
