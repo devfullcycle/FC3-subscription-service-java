@@ -34,17 +34,17 @@ class DefaultCreateAccountTest extends UnitTest {
         var expectedUserId = new UserId("123");
         var expectedAccountId = new AccountId("ACC-123");
 
-        when(accountGateway.nextId()).thenReturn(expectedAccountId);
         when(accountGateway.save(any())).thenAnswer(returnsFirstArg());
 
         // when
-        var actualOutput = this.target.execute(new CreateAccountTestInput(expectedUserId.value(), expectedFirstname, expectedLastname, expectedEmail, expectedDocumentType, expectedDocumentNumber));
+        var actualOutput = this.target.execute(new CreateAccountTestInput(expectedAccountId.value(), expectedUserId.value(), expectedFirstname, expectedLastname, expectedEmail, expectedDocumentType, expectedDocumentNumber));
 
         // then
         Assertions.assertEquals(expectedAccountId, actualOutput.accountId());
     }
 
     record CreateAccountTestInput(
+            String accountId,
             String userId,
             String firstname,
             String lastname,

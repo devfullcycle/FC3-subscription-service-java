@@ -1,9 +1,9 @@
 package com.fullcycle.subscription.infrastructure.mediator;
 
-import com.fullcycle.subscription.application.Presenter;
 import com.fullcycle.subscription.application.account.CreateAccount;
 import com.fullcycle.subscription.application.account.CreateIdpUser;
 import com.fullcycle.subscription.domain.UnitTest;
+import com.fullcycle.subscription.domain.account.AccountGateway;
 import com.fullcycle.subscription.domain.account.AccountId;
 import com.fullcycle.subscription.domain.account.idp.UserId;
 import com.fullcycle.subscription.domain.person.Document;
@@ -20,6 +20,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class SignUpMediatorTest extends UnitTest {
+
+    @Mock
+    private AccountGateway accountGateway;
 
     @Mock
     private CreateAccount createAccount;
@@ -47,11 +50,8 @@ class SignUpMediatorTest extends UnitTest {
 
         var req = new SignUpRequest(expectedDocumentNumber, expectedDocumentType, expectedPassword, expectedEmail, expectedLastname, expectedFirstname);
 
-        when(createIdpUser.execute(any(), any())).thenAnswer(t -> {
-            final Presenter<CreateIdpUser.Output, SignUpRequest> a2 = t.getArgument(1);
-            return a2.apply(() -> expectedUserId);
-        });
-
+        when(accountGateway.nextId()).thenReturn(expectedAccountId);
+        when(createIdpUser.execute(any())).thenReturn(() -> expectedUserId);
         when(createAccount.execute(any(), any())).thenReturn(new SignUpResponse(expectedAccountId.value()));
 
         // when
