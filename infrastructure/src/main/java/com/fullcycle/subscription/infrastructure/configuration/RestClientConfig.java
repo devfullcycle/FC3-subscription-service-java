@@ -2,6 +2,7 @@ package com.fullcycle.subscription.infrastructure.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fullcycle.subscription.infrastructure.configuration.annotations.Keycloak;
+import com.fullcycle.subscription.infrastructure.configuration.annotations.KeycloakAdmin;
 import com.fullcycle.subscription.infrastructure.configuration.properties.RestClientProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -25,8 +26,21 @@ public class RestClientConfig {
     }
 
     @Bean
+    @ConfigurationProperties(prefix = "rest-client.keycloak-admin")
+    @KeycloakAdmin
+    public RestClientProperties keycloakAdminRestClientProperties() {
+        return new RestClientProperties();
+    }
+
+    @Bean
     @Keycloak
     public RestClient keycloakHttpClient(@Keycloak final RestClientProperties properties, final ObjectMapper objectMapper) {
+        return restClient(properties, objectMapper);
+    }
+
+    @Bean
+    @KeycloakAdmin
+    public RestClient keycloakAdminHttpClient(@KeycloakAdmin final RestClientProperties properties, final ObjectMapper objectMapper) {
         return restClient(properties, objectMapper);
     }
 

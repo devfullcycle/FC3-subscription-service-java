@@ -4,8 +4,12 @@ logging:
 
 keycloak:
   token-uri: /protocol/openid-connect/token
+  admin-users-uri: /users
 
 rest-client:
+  keycloak-admin:
+    base-url: "${keycloak.host}/admin/realms/${keycloak.realm}"
+    read-timeout: 1_000
   keycloak:
     base-url: "${keycloak.host}/realms/${keycloak.realm}"
     read-timeout: 1_000
