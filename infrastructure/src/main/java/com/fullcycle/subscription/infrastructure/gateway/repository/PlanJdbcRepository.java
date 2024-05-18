@@ -46,23 +46,22 @@ public class PlanJdbcRepository implements PlanGateway {
     @Override
     public Plan save(final Plan plan) {
         if (plan.version() == 0) {
-            create(plan);
+            return create(plan);
         } else {
-            update(plan);
+            return update(plan);
         }
-
-        return plan;
     }
 
-    private void create(final Plan plan) {
+    private Plan create(final Plan plan) {
         final var sql = """
-                INSERT INTO plans (id, version, name, description, active, currency, amount, created_at, updated_at, deleted_at)
-                VALUES (:id, (:version + 1), :name, :description, :active, :currency, :amount, :createdAt, :updatedAt, :deletedAt)
+                INSERT INTO plans (version, name, description, active, currency, amount, created_at, updated_at, deleted_at)
+                VALUES ((:version + 1), :name, :description, :active, :currency, :amount, :createdAt, :updatedAt, :deletedAt)
                 """;
-        executeUpdate(sql, plan);
+        final var id = this.database.insert(sql, createParams(plan));
+        return plan.withId(new PlanId(id.longValue()));
     }
 
-    private void update(final Plan plan) {
+    private Plan update(final Plan plan) {
         final var sql = """
                 UPDATE plans
                 SET
@@ -77,12 +76,13 @@ public class PlanJdbcRepository implements PlanGateway {
                     deleted_at = :deletedAt
                 WHERE id = :id and version = :version
                 """;
-        if (executeUpdate(sql, plan) == 0) {
+        if (this.database.update(sql, createParams(plan)) == 0) {
             throw new IllegalArgumentException("Plan with id %s and version %s was not found".formatted(plan.id().value(), plan.version()));
         }
+        return plan;
     }
 
-    private int executeUpdate(String sql, Plan plan) {
+    private Map<String, Object> createParams(Plan plan) {
         final var params = new HashMap<String, Object>();
         params.put("version", plan.version());
         params.put("name", plan.name());
@@ -98,7 +98,7 @@ public class PlanJdbcRepository implements PlanGateway {
             params.put("id", plan.id().value());
         }
 
-        return this.database.update(sql, params);
+        return params;
     }
 
     private static RowMap<Plan> planMapper() {
