@@ -88,8 +88,23 @@ public class KeycloakIdentityProviderClient implements IdentityProviderGateway {
     }
 
     @Override
-    public void addUserToGroup(final UserId anId, final GroupId aGroupId) {
+    public void addUserToGroup(final UserId userId, final GroupId aGroupId) {
+        log.info("Adding user to group [userId:{}] [groupId:{}]", userId.value(), aGroupId.value());
+        try {
+            final var res = this.restClient.put()
+                    .uri(this.keycloakProperties.adminUsersUri() + "/{id}/groups/{groupId}", userId.value(), aGroupId.value())
+                    .header(HttpHeaders.AUTHORIZATION, "bearer " + getClientCredentials.retrieve())
+                    .retrieve()
+                    .toBodilessEntity();
 
+            if (!res.getStatusCode().is2xxSuccessful()) {
+                throw InternalErrorException.with("Unexpected Keycloak response [status:%s]".formatted(res.getStatusCode().value()));
+            }
+            log.info("User added to group [userId:{}] [groupId:{}]", userId.value(), aGroupId.value());
+        } catch (HttpStatusCodeException ex) {
+            log.info("Error response observed from Keycloak when trying add user to group [userId:{}] [response:{}]", userId.value(), ex.getResponseBodyAsString());
+            throw InternalErrorException.with("Error response observed when trying to add user to group");
+        }
     }
 
     @Override

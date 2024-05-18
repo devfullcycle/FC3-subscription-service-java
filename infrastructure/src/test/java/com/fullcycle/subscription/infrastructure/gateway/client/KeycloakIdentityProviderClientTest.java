@@ -2,9 +2,11 @@ package com.fullcycle.subscription.infrastructure.gateway.client;
 
 import com.fullcycle.subscription.AbstractRestClientTest;
 import com.fullcycle.subscription.domain.account.AccountId;
+import com.fullcycle.subscription.domain.account.idp.GroupId;
 import com.fullcycle.subscription.domain.account.idp.User;
 import com.fullcycle.subscription.domain.account.idp.UserId;
 import com.fullcycle.subscription.domain.exceptions.DomainException;
+import com.fullcycle.subscription.domain.exceptions.InternalErrorException;
 import com.fullcycle.subscription.domain.person.Email;
 import com.fullcycle.subscription.domain.person.Name;
 import com.fullcycle.subscription.infrastructure.authentication.clientcredentials.GetClientCredentials;
@@ -53,6 +55,8 @@ class KeycloakIdentityProviderClientTest extends AbstractRestClientTest {
         Assertions.assertEquals(expectedUserId, actualResponse);
 
         verify(1, postRequestedFor(urlEqualTo("/admin/realms/test/users"))
+                .withHeader("Authorization", equalTo("bearer " + expectedAuthorization))
+                .withRequestBody(matchingJsonPath("$.firstName", equalTo(expectedName.firstname())))
                 .withRequestBody(equalToJson("""
                         {
                             "firstName": "John",
@@ -89,6 +93,7 @@ class KeycloakIdentityProviderClientTest extends AbstractRestClientTest {
 
         stubFor(
                 post(urlEqualTo("/admin/realms/test/users"))
+                        .withHeader("Authorization", equalTo("bearer " + expectedAuthorization))
                         .willReturn(aResponse()
                                 .withStatus(409)
                                 .withBody("""
@@ -104,5 +109,63 @@ class KeycloakIdentityProviderClientTest extends AbstractRestClientTest {
 
         // then
         Assertions.assertEquals(expectedError, actualError.getErrors().getFirst().message());
+    }
+
+    @Test
+    public void givenValidParams_whenCallsAddUserToGroup_shouldBeOk() {
+        // given
+        var expectedGroupId = new GroupId("GG-123");
+        var expectedUserId = new UserId("b7071c9e-453e-4fd4-9be7-70461f4aa1d7");
+        var expectedAuthorization = "token";
+
+        stubFor(
+                put(urlEqualTo("/admin/realms/test/users/" + expectedUserId.value() + "/groups/" + expectedGroupId.value()))
+                        .willReturn(aResponse()
+                                .withStatus(204)
+                        )
+        );
+
+        doReturn(expectedAuthorization).when(getClientCredentials).retrieve();
+
+        // when
+        this.client.addUserToGroup(expectedUserId, expectedGroupId);
+
+        // then
+        verify(1, putRequestedFor(urlEqualTo("/admin/realms/test/users/b7071c9e-453e-4fd4-9be7-70461f4aa1d7/groups/GG-123"))
+                .withHeader("Authorization", equalTo("bearer " + expectedAuthorization))
+        );
+    }
+
+    @Test
+    public void givenEmptyAuthorization_whenCallsAddUserToGroup_shouldReturnError() {
+        // given
+        var expectedGroupId = new GroupId("GG-123");
+        var expectedUserId = new UserId("b7071c9e-453e-4fd4-9be7-70461f4aa1d7");
+        var expectedAuthorization = "";
+        var expectedMessage = "Error response observed when trying to add user to group";
+
+        stubFor(
+                put(urlEqualTo("/admin/realms/test/users/" + expectedUserId.value() + "/groups/" + expectedGroupId.value()))
+                        .willReturn(aResponse()
+                                .withStatus(401)
+                                .withBody("""
+                                        {
+                                            "error": "HTTP 401 Unauthorized"
+                                        }
+                                        """)
+                        )
+        );
+
+        doReturn(expectedAuthorization).when(getClientCredentials).retrieve();
+
+        // when
+        var actualError = Assertions.assertThrows(InternalErrorException.class, () -> this.client.addUserToGroup(expectedUserId, expectedGroupId));
+
+        // then
+        Assertions.assertEquals(expectedMessage, actualError.getMessage());
+
+        verify(1, putRequestedFor(urlEqualTo("/admin/realms/test/users/b7071c9e-453e-4fd4-9be7-70461f4aa1d7/groups/GG-123"))
+                .withHeader("Authorization", equalTo("bearer" + expectedAuthorization))
+        );
     }
 }
