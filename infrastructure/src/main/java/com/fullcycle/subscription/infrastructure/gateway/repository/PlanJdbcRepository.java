@@ -5,10 +5,10 @@ import com.fullcycle.subscription.domain.plan.Plan;
 import com.fullcycle.subscription.domain.plan.PlanGateway;
 import com.fullcycle.subscription.domain.plan.PlanId;
 import com.fullcycle.subscription.infrastructure.jdbc.DatabaseClient;
+import com.fullcycle.subscription.infrastructure.jdbc.JdbcUtils;
 import com.fullcycle.subscription.infrastructure.jdbc.RowMap;
 import org.springframework.stereotype.Repository;
 
-import java.time.Instant;
 import java.util.*;
 
 @Repository
@@ -110,9 +110,9 @@ public class PlanJdbcRepository implements PlanGateway {
                     rs.getString("description"),
                     rs.getBoolean("active"),
                     new Money(rs.getString("currency"), rs.getDouble("amount")),
-                    rs.getObject("created_at", Instant.class),
-                    rs.getObject("updated_at", Instant.class),
-                    rs.getObject("deleted_at", Instant.class)
+                    JdbcUtils.getInstant(rs, "created_at"),
+                    JdbcUtils.getInstant(rs, "updated_at"),
+                    JdbcUtils.getInstant(rs, "deleted_at")
             );
         };
     }

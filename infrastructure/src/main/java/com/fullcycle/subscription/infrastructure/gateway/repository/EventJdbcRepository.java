@@ -3,6 +3,7 @@ package com.fullcycle.subscription.infrastructure.gateway.repository;
 import com.fullcycle.subscription.domain.DomainEvent;
 import com.fullcycle.subscription.domain.utils.InstantUtils;
 import com.fullcycle.subscription.infrastructure.jdbc.DatabaseClient;
+import com.fullcycle.subscription.infrastructure.jdbc.JdbcUtils;
 import com.fullcycle.subscription.infrastructure.jdbc.RowMap;
 import com.fullcycle.subscription.infrastructure.json.Json;
 import org.springframework.stereotype.Repository;
@@ -29,7 +30,7 @@ public class EventJdbcRepository {
 
     public void saveAll(final Collection<DomainEvent> events) {
         for (var ev : events) {
-            this.insertEvent(Event.newEvent(ev.aggregateId(), ev.aggregateType(), ev.getClass().getCanonicalName(), Json.writeValueAsBytes(ev)));
+            this.insertEvent(Event.newEvent(ev.aggregateId(), ev.aggregateType(), ev.getClass().getCanonicalName(), Json.writeValueAsString(ev)));
         }
     }
 
@@ -49,7 +50,7 @@ public class EventJdbcRepository {
 
     private DomainEvent toDomainEvent(final Event event) {
         try {
-            return (DomainEvent) Json.readValue(event.eventData(), Class.forName(event.eventType()));
+            return (DomainEvent) Json.readTree(event.eventData(), Class.forName(event.eventType()));
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -62,8 +63,8 @@ public class EventJdbcRepository {
                 rs.getString("aggregate_id"),
                 rs.getString("aggregate_type"),
                 rs.getString("event_type"),
-                rs.getObject("event_date", Instant.class),
-                rs.getBytes("event_data")
+                JdbcUtils.getInstant(rs, "event_date"),
+                rs.getString("event_data")
         );
     }
 
@@ -74,10 +75,10 @@ public class EventJdbcRepository {
             String aggregateType,
             String eventType,
             Instant eventDate,
-            byte[] eventData
+            String eventData
     ) {
 
-        public static Event newEvent(String aggregateId, String aggregateType, String eventType, byte[] data) {
+        public static Event newEvent(String aggregateId, String aggregateType, String eventType, String data) {
             return new Event(null, false, aggregateId, aggregateType, eventType, InstantUtils.now(), data);
         }
     }
