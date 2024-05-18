@@ -32,7 +32,7 @@ public class DefaultCreateAccount extends CreateAccount {
 
     private Account newAccountWith(final Input in) {
         return Account.newAccount(
-                this.accountGateway.nextId(),
+                new AccountId(in.accountId()),
                 new UserId(in.userId()),
                 new Email(in.email()),
                 new Name(in.firstname(), in.lastname()),

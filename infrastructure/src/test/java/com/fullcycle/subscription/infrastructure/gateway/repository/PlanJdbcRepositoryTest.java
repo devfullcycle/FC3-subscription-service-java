@@ -129,7 +129,7 @@ class PlanJdbcRepositoryTest extends AbstractRepositoryTest {
         var expectedUpdatedAt = Instant.parse("2024-04-28T10:58:11.111Z");
         var expectedDeletedAt = Instant.parse("2024-04-28T10:59:11.111Z");
 
-        var plan = Plan.with(expectedId, 0, expectedName, expectedDescription, expectedActive, expectedPrice, expectedCreatedAt, expectedUpdatedAt, expectedDeletedAt);
+        var plan = Plan.with(PlanId.empty(), 0, expectedName, expectedDescription, expectedActive, expectedPrice, expectedCreatedAt, expectedUpdatedAt, expectedDeletedAt);
 
         // when
         var responsePlan = this.planRepository().save(plan);

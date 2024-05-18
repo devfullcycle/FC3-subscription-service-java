@@ -1,4 +1,4 @@
-package com.fullcycle.subscription.infrastructure.utils;
+package com.fullcycle.subscription.infrastructure.gateway.client;
 
 import com.fullcycle.subscription.domain.exceptions.InternalErrorException;
 import com.fullcycle.subscription.infrastructure.exceptions.NotFoundException;

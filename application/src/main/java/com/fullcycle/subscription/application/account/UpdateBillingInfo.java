@@ -3,16 +3,14 @@ package com.fullcycle.subscription.application.account;
 import com.fullcycle.subscription.application.UseCase;
 import com.fullcycle.subscription.domain.account.AccountId;
 
-public abstract class CreateAccount extends UseCase<CreateAccount.Input, CreateAccount.Output> {
+public abstract class UpdateBillingInfo extends UseCase<UpdateBillingInfo.Input, UpdateBillingInfo.Output> {
 
     public interface Input {
-        String userId();
         String accountId();
-        String email();
-        String firstname();
-        String lastname();
-        String documentNumber();
-        String documentType();
+        String zipcode();
+        String number();
+        String complement();
+        String country();
     }
 
     public interface Output {
