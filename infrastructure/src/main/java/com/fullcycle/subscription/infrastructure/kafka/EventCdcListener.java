@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fullcycle.subscription.infrastructure.json.Json;
 import com.fullcycle.subscription.infrastructure.kafka.models.connect.MessageValue;
 import com.fullcycle.subscription.infrastructure.kafka.models.event.EventMsg;
+import com.fullcycle.subscription.infrastructure.mediator.EventMediator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -11,12 +12,20 @@ import org.springframework.kafka.listener.adapter.ConsumerRecordMetadata;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 @Component
 public class EventCdcListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(EventCdcListener.class);
     private static final TypeReference<MessageValue<EventMsg>> EVENT_MESSAGE_TYPE = new TypeReference<>() {
     };
+
+    private final EventMediator eventMediator;
+
+    public EventCdcListener(final EventMediator eventMediator) {
+        this.eventMediator = Objects.requireNonNull(eventMediator);
+    }
 
     @KafkaListener(
             concurrency = "${kafka.consumers.events.concurrency}",
@@ -43,6 +52,8 @@ public class EventCdcListener {
             return;
         }
 
-        LOG.info("Message received from Kafka [topic:{}] [partition:{}] [offset:{}]: Processing {}", metadata.topic(), metadata.partition(), metadata.offset(), messagePayload.after());
+        final var eventId = messagePayload.after().eventId();
+        LOG.info("Message received from Kafka [topic:{}] [partition:{}] [offset:{}]: Processing event {}", metadata.topic(), metadata.partition(), metadata.offset(), eventId);
+        this.eventMediator.mediate(eventId);
     }
 }

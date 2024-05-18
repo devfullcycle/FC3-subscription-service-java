@@ -20,12 +20,26 @@ public class EventJdbcRepository {
         this.database = Objects.requireNonNull(databaseClient);
     }
 
+    public Optional<DomainEvent> eventOfId(final Long eventId) {
+        final var sql = "SELECT event_id, processed, aggregate_id, aggregate_type, event_type, event_date, event_data FROM events WHERE event_id = :eventId";
+        final var params = Map.<String, Object>of("eventId", eventId);
+        return this.database.queryOne(sql, params, eventMapper())
+                .map(this::toDomainEvent);
+    }
+
     public List<DomainEvent> allEventsOfAggregate(final String aggregateId, final String aggregateType) {
         final var sql = "SELECT event_id, processed, aggregate_id, aggregate_type, event_type, event_date, event_data FROM events WHERE aggregate_id = :aggregateId and aggregate_type = :aggregateType";
         final var params = Map.<String, Object>of("aggregateId", aggregateId, "aggregateType", aggregateType);
         return this.database.query(sql, params, eventMapper()).stream()
                 .map(this::toDomainEvent)
                 .toList();
+    }
+
+    public void markAsProcessed(final Long eventId) {
+        final var sql = "UPDATE events SET processed = true WHERE event_id = :id";
+        if (this.database.update(sql, Map.of("id", eventId)) == 0) {
+            throw new IllegalArgumentException("Event with id %s was not found".formatted(eventId));
+        }
     }
 
     public void saveAll(final Collection<DomainEvent> events) {

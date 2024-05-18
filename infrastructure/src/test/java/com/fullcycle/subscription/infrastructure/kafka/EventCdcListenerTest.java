@@ -6,6 +6,7 @@ import com.fullcycle.subscription.infrastructure.kafka.models.connect.MessageVal
 import com.fullcycle.subscription.infrastructure.kafka.models.connect.Operation;
 import com.fullcycle.subscription.infrastructure.kafka.models.connect.ValuePayload;
 import com.fullcycle.subscription.infrastructure.kafka.models.event.EventMsg;
+import com.fullcycle.subscription.infrastructure.mediator.EventMediator;
 import org.apache.kafka.clients.admin.TopicListing;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.Assertions;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.kafka.listener.adapter.ConsumerRecordMetadata;
 
@@ -28,6 +30,9 @@ class EventCdcListenerTest extends AbstractEmbeddedKafkaTest {
 
     @SpyBean
     private EventCdcListener eventCdcListener;
+
+    @MockBean
+    private EventMediator eventMediator;
 
     @Value("${kafka.consumers.events.topics}")
     private String eventsTopics;
@@ -50,7 +55,7 @@ class EventCdcListenerTest extends AbstractEmbeddedKafkaTest {
     }
 
     @Test
-    public void givenInvalidResponsesFromHandlerShouldReceiveError() throws Exception {
+    public void givenValidResponsesFromHandlerShouldFinishOk() throws Exception {
         // given
         final var expectedMainTopic = "subscription.subscription.events";
 
@@ -65,6 +70,8 @@ class EventCdcListenerTest extends AbstractEmbeddedKafkaTest {
             latch.countDown();
             return t.callRealMethod();
         }).when(eventCdcListener).onMessage(any(), any());
+
+        doNothing().when(eventMediator).mediate(actualEvent.eventId());
 
         // when
         producer().send(new ProducerRecord<>(eventsTopics, message)).get(10, TimeUnit.SECONDS);
