@@ -5,7 +5,7 @@ import com.fullcycle.subscription.domain.utils.InstantUtils;
 import java.time.Instant;
 import java.time.LocalDate;
 
-record SubscriptionCanceled(
+public record SubscriptionCanceled(
         String subscriptionId,
         String accountId,
         Long planId,

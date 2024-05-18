@@ -109,7 +109,7 @@ public class KeycloakIdentityProviderClient implements IdentityProviderGateway {
 
     @Override
     public void removeUserFromGroup(final UserId userId, final GroupId aGroupId) {
-        log.info("Removing user to group [userId:{}] [groupId:{}]", userId.value(), aGroupId.value());
+        log.info("Removing user from group [userId:{}] [groupId:{}]", userId.value(), aGroupId.value());
         try {
             final var res = this.restClient.delete()
                     .uri(this.keycloakProperties.adminUsersUri() + "/{id}/groups/{groupId}", userId.value(), aGroupId.value())
@@ -120,7 +120,7 @@ public class KeycloakIdentityProviderClient implements IdentityProviderGateway {
             if (!res.getStatusCode().is2xxSuccessful()) {
                 throw InternalErrorException.with("Unexpected Keycloak response [status:%s]".formatted(res.getStatusCode().value()));
             }
-            log.info("User removed to group [userId:{}] [groupId:{}]", userId.value(), aGroupId.value());
+            log.info("User removed from group [userId:{}] [groupId:{}]", userId.value(), aGroupId.value());
         } catch (HttpStatusCodeException ex) {
             log.info("Error response observed from Keycloak when trying remove user from group [userId:{}] [response:{}]", userId.value(), ex.getResponseBodyAsString());
             throw InternalErrorException.with("Error response observed when trying to remove user from group");

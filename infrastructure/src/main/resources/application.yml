@@ -1,6 +1,8 @@
 logging:
   level:
-    org.springframework.security: DEBUG
+    ROOT: WARN
+    org.springframework.security: WARN
+    com.fullcycle: DEBUG
 
 kafka:
   auto-create-topics: false
@@ -16,6 +18,7 @@ kafka:
 keycloak:
   token-uri: /protocol/openid-connect/token
   admin-users-uri: /users
+  subscribers-group-id: ae4561cf-938d-4640-89b0-0ac72e5d53db
 
 rest-client:
   keycloak-admin:

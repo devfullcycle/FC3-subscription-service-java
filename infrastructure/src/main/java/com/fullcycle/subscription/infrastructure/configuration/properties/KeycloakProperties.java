@@ -11,6 +11,7 @@ public class KeycloakProperties {
     private String clientSecret;
     private String tokenUri;
     private String adminUsersUri;
+    private String subscribersGroupId;
 
     public String clientId() {
         return clientId;
@@ -42,5 +43,13 @@ public class KeycloakProperties {
 
     public void setAdminUsersUri(String adminUsersUri) {
         this.adminUsersUri = adminUsersUri;
+    }
+
+    public String subscribersGroupId() {
+        return subscribersGroupId;
+    }
+
+    public void setSubscribersGroupId(String subscribersGroupId) {
+        this.subscribersGroupId = subscribersGroupId;
     }
 }
