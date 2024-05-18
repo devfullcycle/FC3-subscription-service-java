@@ -1,6 +1,7 @@
 package com.fullcycle.subscription.infrastructure.rest;
 
 import com.fullcycle.subscription.ControllerTest;
+import com.fullcycle.subscription.application.account.UpdateBillingInfo;
 import com.fullcycle.subscription.domain.account.AccountId;
 import com.fullcycle.subscription.domain.person.Document;
 import com.fullcycle.subscription.infrastructure.mediator.SignUpMediator;
@@ -31,6 +32,9 @@ public class AccountRestApiTest {
 
     @MockBean
     private SignUpMediator signUpMediator;
+
+    @MockBean
+    private UpdateBillingInfo updateBillingInfo;
 
     @Captor
     private ArgumentCaptor<SignUpRequest> signUpRequestCaptor;
