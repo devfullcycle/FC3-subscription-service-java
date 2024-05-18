@@ -20,8 +20,8 @@ public class EventJdbcRepository {
         this.database = Objects.requireNonNull(databaseClient);
     }
 
-    public Optional<DomainEvent> eventOfId(final Long eventId) {
-        final var sql = "SELECT event_id, processed, aggregate_id, aggregate_type, event_type, event_date, event_data FROM events WHERE event_id = :eventId";
+    public Optional<DomainEvent> eventOfIdAndUnprocessed(final Long eventId) {
+        final var sql = "SELECT event_id, processed, aggregate_id, aggregate_type, event_type, event_date, event_data FROM events WHERE event_id = :eventId AND processed = false";
         final var params = Map.<String, Object>of("eventId", eventId);
         return this.database.queryOne(sql, params, eventMapper())
                 .map(this::toDomainEvent);

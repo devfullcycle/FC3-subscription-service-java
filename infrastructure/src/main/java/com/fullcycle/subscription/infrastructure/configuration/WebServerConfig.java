@@ -1,6 +1,8 @@
 package com.fullcycle.subscription.infrastructure.configuration;
 
+import com.fullcycle.subscription.domain.DomainEvent;
 import com.fullcycle.subscription.infrastructure.authentication.clientcredentials.RefreshClientCredentials;
+import com.fullcycle.subscription.infrastructure.observer.Publisher;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -34,5 +36,10 @@ public class WebServerConfig {
     @Bean
     LocalValidatorFactoryBean localValidatorFactoryBean() {
         return new LocalValidatorFactoryBean();
+    }
+
+    @Bean
+    Publisher<DomainEvent> domainEventPublisher() {
+        return new Publisher<>();
     }
 }

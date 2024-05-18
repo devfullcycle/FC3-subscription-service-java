@@ -25,7 +25,7 @@ class EventMediatorTest extends UnitTest {
         // given
         var expectedEventId = 123L;
 
-        when(eventRepository.eventOfId(expectedEventId))
+        when(eventRepository.eventOfIdAndUnprocessed(expectedEventId))
                 .thenReturn(Optional.of(new AccountCreated(Fixture.Accounts.john())));
 
         doNothing().when(eventRepository).markAsProcessed(expectedEventId);
