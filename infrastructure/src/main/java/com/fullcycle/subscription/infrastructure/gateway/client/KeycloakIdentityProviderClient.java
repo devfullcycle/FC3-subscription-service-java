@@ -83,7 +83,7 @@ public class KeycloakIdentityProviderClient implements IdentityProviderGateway {
             throw DomainException.with("Invalid username or password");
         } catch (HttpStatusCodeException ex) {
             log.info("Error response observed from Keycloak [accountId:{}] [response:{}]", account, ex.getResponseBodyAsString());
-            throw InternalErrorException.with(ex.getMessage());
+            throw InternalErrorException.with("Error response observed when trying create user");
         }
     }
 
@@ -108,8 +108,23 @@ public class KeycloakIdentityProviderClient implements IdentityProviderGateway {
     }
 
     @Override
-    public void removeUserFromGroup(final UserId anId, final GroupId aGroupId) {
+    public void removeUserFromGroup(final UserId userId, final GroupId aGroupId) {
+        log.info("Removing user to group [userId:{}] [groupId:{}]", userId.value(), aGroupId.value());
+        try {
+            final var res = this.restClient.delete()
+                    .uri(this.keycloakProperties.adminUsersUri() + "/{id}/groups/{groupId}", userId.value(), aGroupId.value())
+                    .header(HttpHeaders.AUTHORIZATION, "bearer " + getClientCredentials.retrieve())
+                    .retrieve()
+                    .toBodilessEntity();
 
+            if (!res.getStatusCode().is2xxSuccessful()) {
+                throw InternalErrorException.with("Unexpected Keycloak response [status:%s]".formatted(res.getStatusCode().value()));
+            }
+            log.info("User removed to group [userId:{}] [groupId:{}]", userId.value(), aGroupId.value());
+        } catch (HttpStatusCodeException ex) {
+            log.info("Error response observed from Keycloak when trying remove user from group [userId:{}] [response:{}]", userId.value(), ex.getResponseBodyAsString());
+            throw InternalErrorException.with("Error response observed when trying to remove user from group");
+        }
     }
 
     private String getUserId(final HttpHeaders headers) {

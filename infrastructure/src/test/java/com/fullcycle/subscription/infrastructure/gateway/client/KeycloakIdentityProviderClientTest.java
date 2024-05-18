@@ -168,4 +168,62 @@ class KeycloakIdentityProviderClientTest extends AbstractRestClientTest {
                 .withHeader("Authorization", equalTo("bearer" + expectedAuthorization))
         );
     }
+
+    @Test
+    public void givenValidParams_whenCallsRemoveUserFromGroup_shouldBeOk() {
+        // given
+        var expectedGroupId = new GroupId("GG-123");
+        var expectedUserId = new UserId("b7071c9e-453e-4fd4-9be7-70461f4aa1d7");
+        var expectedAuthorization = "token";
+
+        stubFor(
+                delete(urlEqualTo("/admin/realms/test/users/" + expectedUserId.value() + "/groups/" + expectedGroupId.value()))
+                        .willReturn(aResponse()
+                                .withStatus(204)
+                        )
+        );
+
+        doReturn(expectedAuthorization).when(getClientCredentials).retrieve();
+
+        // when
+        this.client.removeUserFromGroup(expectedUserId, expectedGroupId);
+
+        // then
+        verify(1, deleteRequestedFor(urlEqualTo("/admin/realms/test/users/b7071c9e-453e-4fd4-9be7-70461f4aa1d7/groups/GG-123"))
+                .withHeader("Authorization", equalTo("bearer " + expectedAuthorization))
+        );
+    }
+
+    @Test
+    public void givenEmptyAuthorization_whenCallsRemoveUserFromGroup_shouldReturnError() {
+        // given
+        var expectedGroupId = new GroupId("GG-123");
+        var expectedUserId = new UserId("b7071c9e-453e-4fd4-9be7-70461f4aa1d7");
+        var expectedAuthorization = "";
+        var expectedMessage = "Error response observed when trying to remove user from group";
+
+        stubFor(
+                delete(urlEqualTo("/admin/realms/test/users/" + expectedUserId.value() + "/groups/" + expectedGroupId.value()))
+                        .willReturn(aResponse()
+                                .withStatus(401)
+                                .withBody("""
+                                        {
+                                            "error": "HTTP 401 Unauthorized"
+                                        }
+                                        """)
+                        )
+        );
+
+        doReturn(expectedAuthorization).when(getClientCredentials).retrieve();
+
+        // when
+        var actualError = Assertions.assertThrows(InternalErrorException.class, () -> this.client.removeUserFromGroup(expectedUserId, expectedGroupId));
+
+        // then
+        Assertions.assertEquals(expectedMessage, actualError.getMessage());
+
+        verify(1, deleteRequestedFor(urlEqualTo("/admin/realms/test/users/b7071c9e-453e-4fd4-9be7-70461f4aa1d7/groups/GG-123"))
+                .withHeader("Authorization", equalTo("bearer" + expectedAuthorization))
+        );
+    }
 }
