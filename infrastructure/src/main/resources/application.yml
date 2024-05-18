@@ -2,6 +2,17 @@ logging:
   level:
     org.springframework.security: DEBUG
 
+kafka:
+  auto-create-topics: false
+  pool-timeout: 1_000
+  consumers:
+    events:
+      auto-offset-reset: earliest
+      concurrency: 1
+      id: kafka-listener-events
+      topics: subscription.subscription.events
+      group-id: subscription-service
+
 keycloak:
   token-uri: /protocol/openid-connect/token
   admin-users-uri: /users
