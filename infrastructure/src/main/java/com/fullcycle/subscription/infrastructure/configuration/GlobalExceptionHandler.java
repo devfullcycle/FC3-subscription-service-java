@@ -1,5 +1,7 @@
 package com.fullcycle.subscription.infrastructure.configuration;
 
+import com.fullcycle.subscription.domain.exceptions.DomainException;
+import com.fullcycle.subscription.domain.exceptions.InternalErrorException;
 import com.fullcycle.subscription.domain.validation.Error;
 import com.fullcycle.subscription.domain.validation.handler.Notification;
 import com.fullcycle.subscription.infrastructure.exceptions.ForbiddenException;
@@ -24,6 +26,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         return ResponseEntity.unprocessableEntity()
                 .body(Notification.create(covertError(ex.getBindingResult().getAllErrors())));
+    }
+
+    @ExceptionHandler(DomainException.class)
+    public ResponseEntity<?> handleDomainException(DomainException ex) {
+        return ResponseEntity.unprocessableEntity().body(ex.getErrors());
+    }
+
+    @ExceptionHandler(InternalErrorException.class)
+    public ResponseEntity<?> handleInternalErrorException(InternalErrorException ex) {
+        return ResponseEntity.internalServerError().body(new Error("", ex.getMessage()));
     }
 
     @ExceptionHandler(ForbiddenException.class)
