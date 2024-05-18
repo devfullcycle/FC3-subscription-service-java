@@ -16,7 +16,7 @@ public class DomainException extends NoStacktraceException {
     }
 
     public static DomainException with(final String aMessage) {
-        return new DomainException(aMessage, List.of(new Error(aMessage)));
+        return new DomainException(aMessage, List.of(new Error("", aMessage)));
     }
 
     public static DomainException notFound(Class<? extends AggregateRoot<?>> aggClass, Identifier id) {

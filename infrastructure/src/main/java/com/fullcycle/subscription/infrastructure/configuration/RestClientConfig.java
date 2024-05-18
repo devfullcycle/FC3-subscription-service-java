@@ -13,6 +13,7 @@ import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestClient;
 
+import java.net.http.HttpClient;
 import java.util.List;
 
 @Configuration(proxyBeanMethods = false)
@@ -45,7 +46,7 @@ public class RestClientConfig {
     }
 
     private static RestClient restClient(final RestClientProperties properties, final ObjectMapper objectMapper) {
-        final var factory = new JdkClientHttpRequestFactory();
+        final var factory = new JdkClientHttpRequestFactory(HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build());
         factory.setReadTimeout(properties.readTimeout());
 
         return RestClient.builder()
